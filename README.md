@@ -12,10 +12,13 @@ Helper methods to start various intents:
     sendEmail(Context context, String email, String subject, String content)
     
     /* Starting email activity */
-    sendEmailAsHtml(Context context, String email, String subject, Spanned content)
-    
+    sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails, String subject, String content)
+
     /* Starting email activity */
-    sendEmail(Context context, String[] toEmails, String subject, Spanned content, String mimeType, String attachedFileUri)
+    sendEmailAsHtml(Context context, String email, String subject, Spanned content)
+
+    /* Starting email activity */
+    sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails, String subject, Spanned content, String mimeType, String attachedFileUri)
     
     /* Starting sms activity */
     sendSms(Context context, String content)
@@ -34,6 +37,10 @@ Helper methods to start various intents:
     
     /* Starting Google Play */
     openGooglePlay(Context context, String appPackage)
+
+    /* Starting external activity. If useChooser == false but there were no activities to handle given intent chooser will be used to show empty dialog.
+       Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities. */
+    startExternalActivity(Context context, Intent intent, boolean useChooser)
 
 #### How to build ####
 

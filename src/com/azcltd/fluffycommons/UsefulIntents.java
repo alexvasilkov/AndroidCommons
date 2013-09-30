@@ -20,19 +20,28 @@ public class UsefulIntents {
 
     /**
      * Starts email activity. See also
-     * {@link #sendEmail(android.content.Context, String[], String, android.text.Spanned, String, String) sendEmail}.
+     * {@link #sendEmail(android.content.Context, String[], String[], String[], String, android.text.Spanned, String, String) sendEmail}.
      */
     public static void sendEmail(Context context, String email, String subject, String content) {
-        sendEmail(context, email == null ? null : new String[]{email}, subject,
-                content == null ? null : new SpannableString(content), null, null);
+        sendEmail(context, email == null ? null : new String[]{email}, null, null, subject, content);
     }
 
     /**
      * Starts email activity, email content is considered as Html (i.e. Html.fromHtml(...)).<br/>
-     * See also {@link #sendEmail(android.content.Context, String[], String, android.text.Spanned, String, String) sendEmail}.
+     * See also {@link #sendEmail(android.content.Context, String[], String[], String[], String, android.text.Spanned, String, String) sendEmail}.
      */
     public static void sendEmailAsHtml(Context context, String email, String subject, Spanned content) {
-        sendEmail(context, email == null ? null : new String[]{email}, subject, content, MIME_TYPE_HTML, null);
+        sendEmail(context, email == null ? null : new String[]{email}, null, null, subject, content, MIME_TYPE_HTML, null);
+    }
+
+    /**
+     * Starts email activity. See also
+     * {@link #sendEmail(android.content.Context, String[], String[], String[], String, android.text.Spanned, String, String) sendEmail}.
+     */
+    public static void sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails,
+                                 String subject, String content) {
+        sendEmail(context, toEmails, ccEmails, bccEmails, subject,
+                content == null ? null : new SpannableString(content), null, null);
     }
 
     /**
@@ -40,23 +49,27 @@ public class UsefulIntents {
      *
      * @param context         Context
      * @param toEmails        Destination emails
+     * @param ccEmails        Emails for CC field
+     * @param bccEmails       Emails for BCC field
      * @param subject         Email subject
      * @param content         Email content
      * @param mimeType        Mime type of email content
      * @param attachedFileUri Attached file URI
      */
-    public static void sendEmail(Context context, String[] toEmails, String subject, Spanned content, String mimeType,
-                                 String attachedFileUri) {
+    public static void sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails,
+                                 String subject, Spanned content, String mimeType, String attachedFileUri) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType(mimeType == null ? MIME_TYPE_EMAIL : mimeType);
         if (toEmails != null) intent.putExtra(Intent.EXTRA_EMAIL, toEmails);
+        if (ccEmails != null) intent.putExtra(Intent.EXTRA_CC, ccEmails);
+        if (bccEmails != null) intent.putExtra(Intent.EXTRA_BCC, bccEmails);
         if (subject != null) intent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
         if (content != null) intent.putExtra(Intent.EXTRA_TEXT, content);
         if (attachedFileUri != null) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(attachedFileUri));
         }
-        startActivity(context, intent, false);
+        startExternalActivity(context, intent, false);
     }
 
     /**
@@ -69,7 +82,7 @@ public class UsefulIntents {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setType("vnd.android-dir/mms-sms");
         if (content != null) intent.putExtra("sms_body", content);
-        startActivity(context, intent, false);
+        startExternalActivity(context, intent, false);
     }
 
     /**
@@ -126,7 +139,7 @@ public class UsefulIntents {
         if (description != null) intent.putExtra("description", description);
         if (location != null) intent.putExtra("eventLocation", location);
 
-        startActivity(context, intent, false);
+        startExternalActivity(context, intent, false);
     }
 
     /**
@@ -136,7 +149,7 @@ public class UsefulIntents {
      * @param url     Web-page url
      */
     public static void openWebBrowser(Context context, String url) {
-        startActivity(context, new Intent(Intent.ACTION_VIEW, Uri.parse(url)), false);
+        startExternalActivity(context, new Intent(Intent.ACTION_VIEW, Uri.parse(url)), false);
     }
 
     /**
@@ -151,27 +164,32 @@ public class UsefulIntents {
         if (title != null) intent.putExtra(Intent.EXTRA_SUBJECT, title);
         intent.putExtra(Intent.EXTRA_TEXT, text);
 
-        startActivity(context, intent, true);
+        startExternalActivity(context, intent, true);
     }
 
     public static void dial(Context context, String phone) {
-        startActivity(context, new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone)), false);
+        startExternalActivity(context, new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone)), false);
     }
 
     public static void openGooglePlay(Context context, String appPackage) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackage));
-        boolean started = startActivity(context, intent, false);
+        boolean started = startExternalActivity(context, intent, false);
         if (!started) openWebBrowser(context, "http://play.google.com/store/apps/details?id=" + appPackage);
     }
 
-    private static boolean startActivity(Context context, Intent intent, boolean useChooser) {
+    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         try {
             context.startActivity(useChooser ? Intent.createChooser(intent, null) : intent);
             return true;
         } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-            return false;
+            try {
+                context.startActivity(Intent.createChooser(intent, null));
+                return true;
+            } catch (ActivityNotFoundException e2) {
+                e2.printStackTrace();
+                return false;
+            }
         }
     }
 
