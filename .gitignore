@@ -1,0 +1,7 @@
+bin
+target
+gen
+.settings
+*.iml
+*.iws
+*.ipr
