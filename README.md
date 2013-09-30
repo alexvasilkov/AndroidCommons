@@ -2,6 +2,38 @@
 
 Various useful utilities for Android apps development.
 
+#### Classes ####
+
+##### UsefulIntents #####
+
+Helper methods to start various intents:
+
+    /* Starting email activity */
+    sendEmail(Context context, String email, String subject, String content)
+    
+    /* Starting email activity */
+    sendEmailAsHtml(Context context, String email, String subject, Spanned content)
+    
+    /* Starting email activity */
+    sendEmail(Context context, String[] toEmails, String subject, Spanned content, String mimeType, String attachedFileUri)
+    
+    /* Starting sms activity */
+    sendSms(Context context, String content)
+    
+    /* Starting 'add to calendar' activity */
+    addCalendarEvent(Context context, long beginTime, long endTime, TimeZone tz, boolean isAllDay, String title, String description, String location)
+    
+    /* Starting web browser */
+    openWebBrowser(Context context, String url)
+    
+    /* Common share action */
+    share(Context context, String title, String text)
+    
+    /* Starting dailer */
+    dial(Context context, String phone)
+    
+    /* Starting Google Play */
+    openGooglePlay(Context context, String appPackage)
 
 #### How to build ####
 
