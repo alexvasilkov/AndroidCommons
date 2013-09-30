@@ -65,7 +65,7 @@ public class UsefulIntents {
      * @param context Context
      * @param content SMS content
      */
-    public static void startSmsActivity(Context context, String content) {
+    public static void sendSms(Context context, String content) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setType("vnd.android-dir/mms-sms");
         if (content != null) intent.putExtra("sms_body", content);
@@ -135,7 +135,7 @@ public class UsefulIntents {
      * @param context Context
      * @param url     Web-page url
      */
-    public static void showWeb(Context context, String url) {
+    public static void openWebBrowser(Context context, String url) {
         startActivity(context, new Intent(Intent.ACTION_VIEW, Uri.parse(url)), false);
     }
 
@@ -161,7 +161,7 @@ public class UsefulIntents {
     public static void openGooglePlay(Context context, String appPackage) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackage));
         boolean started = startActivity(context, intent, false);
-        if (!started) showWeb(context, "http://play.google.com/store/apps/details?id=" + appPackage);
+        if (!started) openWebBrowser(context, "http://play.google.com/store/apps/details?id=" + appPackage);
     }
 
     private static boolean startActivity(Context context, Intent intent, boolean useChooser) {
