@@ -42,6 +42,21 @@ Helper methods to start various intents:
        Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities. */
     startExternalActivity(Context context, Intent intent, boolean useChooser)
 
+##### KeyboardHelper #####
+
+Helper methods to show / hide keyboard and determine keyboard state:
+
+    hideSoftKeyboard(Activity activity)
+
+    hideSoftKeyboard(Context context, View view)
+
+    showSoftKeyboard(Context context, View view)
+
+    /* Registering listener for soft keyboard state changes. State computed based on rootView height changes.
+       rootView - should be deepest full screen view, i.e. root of the layout passed to Activity.setContentView(...)
+       or view returned by Fragment.onCreateView(...). */
+    addKeyboardShowListener(final View rootView, final OnKeyboardShowListener listener)
+
 #### How to build ####
 
 You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file will be generated into `target` folder.
