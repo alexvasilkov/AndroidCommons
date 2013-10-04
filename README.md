@@ -2,6 +2,8 @@
 
 Various useful utilities for Android apps development.
 
+API documentation provided as javadocs and will be generated along with jar file. See *How to build* section.
+
 #### Classes ####
 
 ##### UsefulIntents #####
@@ -18,7 +20,7 @@ Helper methods to store various values in SharedPreferences.
 
 #### How to build ####
 
-You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file will be generated into `target` folder.
+You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file and javadocs will be generated into `target` folder.
 
 #### License ####
 

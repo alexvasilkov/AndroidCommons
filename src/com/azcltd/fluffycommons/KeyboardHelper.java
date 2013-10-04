@@ -44,7 +44,7 @@ public final class KeyboardHelper {
 
     /**
      * Registers listener for soft keyboard state changes.<br/>
-     * The state is computed based on rootView height changes.
+     * The state is computed based on rootView height changes.<br/>
      * Note: In AndroidManifest corresponding activity should have <code>android:windowSoftInputMode</code>
      * set to <code>adjustResize</code>.
      *
