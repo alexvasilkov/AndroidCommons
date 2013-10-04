@@ -2,7 +2,7 @@
 
 Various useful utilities for Android apps development.
 
-API documentation provided as javadocs and will be generated along with jar file. See *How to build* section.
+API documentation provided as javadocs and will be generated along with jar file. See _How to build_ section.
 
 #### Classes ####
 
