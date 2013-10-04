@@ -153,6 +153,9 @@ public class UsefulIntents {
     }
 
     /**
+     * Opens chooser dialog with all apps that can share the text.
+     * Uses Intent.ACTION_SEND action and "plain/text" mime type.
+     *
      * @param context Context
      * @param title   Use null for no title
      * @param text    Text to share
@@ -167,16 +170,32 @@ public class UsefulIntents {
         startExternalActivity(context, intent, true);
     }
 
+    /**
+     * Opens standard dialer app with prefilled phone number.
+     */
     public static void dial(Context context, String phone) {
         startExternalActivity(context, new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone)), false);
     }
 
+    /**
+     * Opens Google Play app details screen for specified package. Opens browser if Google Play app is not found.
+     */
     public static void openGooglePlay(Context context, String appPackage) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackage));
         boolean started = startExternalActivity(context, intent, false);
         if (!started) openWebBrowser(context, "http://play.google.com/store/apps/details?id=" + appPackage);
     }
 
+    /**
+     * Starts external activity.<br/>
+     * If useChooser == false but there were no activities to handle given intent chooser will be used to show empty dialog.<br/>
+     * Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities.
+     *
+     * @param context    Context
+     * @param intent     Intent to open
+     * @param useChooser Whether or not use default chooser dialog
+     * @return <code>true<code/> if intent was started
+     */
     public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         try {

@@ -8,10 +8,20 @@ import android.view.inputmethod.InputMethodManager;
 
 public final class KeyboardHelper {
 
+    /**
+     * Hides keyboard using currently focused view.<br/>
+     * Shortcat for {@link #hideSoftKeyboard(android.content.Context, android.view.View...) hideSoftKeyboard(activity, activity.getCurrentFocus())}.
+     */
     public static void hideSoftKeyboard(Activity activity) {
         hideSoftKeyboard(activity, activity.getCurrentFocus());
     }
 
+    /**
+     * Uses given views to hide soft keyboard and to clear current focus.
+     *
+     * @param context Context
+     * @param views   Currently focused views
+     */
     public static void hideSoftKeyboard(Context context, View... views) {
         if (views == null) return;
         InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -22,6 +32,9 @@ public final class KeyboardHelper {
         }
     }
 
+    /**
+     * Shows soft keyboard and requests focus for given view.
+     */
     public static void showSoftKeyboard(Context context, View view) {
         if (view == null) return;
         InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -29,6 +42,16 @@ public final class KeyboardHelper {
         manager.showSoftInput(view, 0);
     }
 
+    /**
+     * Registers listener for soft keyboard state changes.<br/>
+     * The state is computed based on rootView height changes.
+     * Note: In AndroidManifest corresponding activity should have <code>android:windowSoftInputMode</code>
+     * set to <code>adjustResize</code>.
+     *
+     * @param rootView should be deepest full screen view, i.e. root of the layout passed to
+     *                 Activity.setContentView(...) or view returned by Fragment.onCreateView(...)
+     * @param listener Keyboard state listener
+     */
     public static void addKeyboardShowListener(final View rootView, final OnKeyboardShowListener listener) {
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
             private boolean mIsKeyboardShown;

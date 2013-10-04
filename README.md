@@ -6,56 +6,15 @@ Various useful utilities for Android apps development.
 
 ##### UsefulIntents #####
 
-Helper methods to start various intents:
-
-    /* Starting email activity */
-    sendEmail(Context context, String email, String subject, String content)
-    
-    /* Starting email activity */
-    sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails, String subject, String content)
-
-    /* Starting email activity */
-    sendEmailAsHtml(Context context, String email, String subject, Spanned content)
-
-    /* Starting email activity */
-    sendEmail(Context context, String[] toEmails, String[] ccEmails, String[] bccEmails, String subject, Spanned content, String mimeType, String attachedFileUri)
-    
-    /* Starting sms activity */
-    sendSms(Context context, String content)
-    
-    /* Starting 'add to calendar' activity */
-    addCalendarEvent(Context context, long beginTime, long endTime, TimeZone tz, boolean isAllDay, String title, String description, String location)
-    
-    /* Starting web browser */
-    openWebBrowser(Context context, String url)
-    
-    /* Common share action */
-    share(Context context, String title, String text)
-    
-    /* Starting dailer */
-    dial(Context context, String phone)
-    
-    /* Starting Google Play */
-    openGooglePlay(Context context, String appPackage)
-
-    /* Starting external activity. If useChooser == false but there were no activities to handle given intent chooser will be used to show empty dialog.
-       Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities. */
-    startExternalActivity(Context context, Intent intent, boolean useChooser)
+Helper methods to start external apps, i.e. Email app, Calendar app and so on.
 
 ##### KeyboardHelper #####
 
-Helper methods to show / hide keyboard and determine keyboard state:
+Helper methods to show / hide keyboard and determine keyboard state.
 
-    hideSoftKeyboard(Activity activity)
+##### Preferences, PreferencesHelper #####
 
-    hideSoftKeyboard(Context context, View view)
-
-    showSoftKeyboard(Context context, View view)
-
-    /* Registering listener for soft keyboard state changes. State computed based on rootView height changes.
-       rootView - should be deepest full screen view, i.e. root of the layout passed to Activity.setContentView(...)
-       or view returned by Fragment.onCreateView(...). */
-    addKeyboardShowListener(final View rootView, final OnKeyboardShowListener listener)
+Helper methods to store various values in SharedPreferences.
 
 #### How to build ####
 
