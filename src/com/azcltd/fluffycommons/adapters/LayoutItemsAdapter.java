@@ -14,8 +14,10 @@ import java.util.Queue;
  */
 public abstract class LayoutItemsAdapter<T> extends ItemsAdapter<T> {
 
+    public static final int TAG_TYPE_ID = -10000;
+
     private boolean mUseRecycler = false;
-    private Queue<View> mRecycledViews = null;
+    private Queue<View>[] mRecycledViews = null;
     private ViewGroup mLayout;
 
     public LayoutItemsAdapter(Context context) {
@@ -29,9 +31,11 @@ public abstract class LayoutItemsAdapter<T> extends ItemsAdapter<T> {
         if (mUseRecycler == use) return;
         mUseRecycler = use;
         if (use) {
-            mRecycledViews = new LinkedList<View>();
+            mRecycledViews = new Queue[getViewTypeCount()];
+            for (int i = 0; i < getViewTypeCount(); i++) {
+                mRecycledViews[i] = new LinkedList<View>();
+            }
         } else {
-            mRecycledViews.clear();
             mRecycledViews = null;
         }
     }
@@ -62,7 +66,10 @@ public abstract class LayoutItemsAdapter<T> extends ItemsAdapter<T> {
 
         int size = getCount();
         for (int pos = 0; pos < size; pos++) {
-            layout.addView(getView(pos, pollRecycledView(), layout));
+            int type = getItemViewType(pos);
+            View view = getView(pos, pollRecycledView(type), layout);
+            view.setTag(TAG_TYPE_ID, type);
+            layout.addView(view);
         }
     }
 
@@ -74,16 +81,17 @@ public abstract class LayoutItemsAdapter<T> extends ItemsAdapter<T> {
 
         int size = layout.getChildCount();
         for (int i = 0; i < size; i++) {
-            View v = layout.getChildAt(i);
-            mRecycledViews.offer(v);
-            onRecycleView(v);
+            View view = layout.getChildAt(i);
+            int type = (Integer) view.getTag(TAG_TYPE_ID);
+            mRecycledViews[type].offer(view);
+            onRecycleView(view);
         }
 
         layout.removeAllViews();
     }
 
-    protected View pollRecycledView() {
-        return mUseRecycler ? mRecycledViews.poll() : null;
+    protected View pollRecycledView(int itemType) {
+        return mUseRecycler ? mRecycledViews[itemType].poll() : null;
     }
 
     /**
