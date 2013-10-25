@@ -2,29 +2,27 @@
 
 Various useful utilities for Android apps development.
 
-API documentation provided as javadocs and will be generated along with jar file. See _How to build_ section.
+API documentation provided as javadocs and will be generated along with jar file. See __How to build__ section.
 
 #### Classes ####
 
-##### UsefulIntents #####
+##### Preferences & PreferencesHelper #####
+Helper methods to store various values in SharedPreferences.
 
+##### InstanceStateManager #####
+Helper methods to save and restore instance state of activities and fragments.
+
+##### ItemsAdapter & LayoutItemsAdapter #####
+BaseAdapter implementations to be used with java.util.List. LayoutItemsAdapter class provides methods to populate any ViewGroup with views from adapter with optional views recycling mechanism.
+
+##### UsefulIntents #####
 Helper methods to start external apps, i.e. Email app, Calendar app and so on.
 
 ##### KeyboardHelper #####
-
 Helper methods to show / hide keyboard and determine keyboard state.
 
-##### Preferences, PreferencesHelper #####
-
-Helper methods to store various values in SharedPreferences.
-
-##### ItemsAdapter & LayoutItemsAdapter #####
-
-BaseAdapter implementations to be used with java.util.List. LayoutItemsAdapter class provides methods to populate any ViewGroup with views from adapter with optional views recycling mechanism.
-
-##### InstanceStateManager #####
-
-Helper methods to save and restore instance state of activities and fragments.
+##### ThreadSafeDateFormatter #####
+Thread safe wrapper for SimpleDateFormatter.
 
 #### How to build ####
 
