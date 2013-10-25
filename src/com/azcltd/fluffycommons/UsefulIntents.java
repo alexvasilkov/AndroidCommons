@@ -1,12 +1,14 @@
 package com.azcltd.fluffycommons;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
+import android.provider.ContactsContract;
 import android.text.SpannableString;
 import android.text.Spanned;
 
@@ -187,28 +189,56 @@ public class UsefulIntents {
     }
 
     /**
+     * Opens phone picker activity. See also {@link UsefulIntentsHandler#onPickPhoneResult(android.content.Context, android.content.Intent)}
+     */
+    public static void pickPhoneNumber(Activity activity, int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+        startExternalActivity(activity, intent, false, requestCode);
+    }
+
+    /**
+     * Shortcut to {@link #startExternalActivity(android.content.Context, android.content.Intent, boolean, Integer)
+     * startExternalActivity(context, intent, useChooser, null)}
+     */
+    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser) {
+        return startExternalActivity(context, intent, useChooser, null);
+    }
+
+    /**
      * Starts external activity.<br/>
      * If useChooser == false but there were no activities to handle given intent chooser will be used to show empty dialog.<br/>
      * Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities.
      *
-     * @param context    Context
-     * @param intent     Intent to open
-     * @param useChooser Whether or not use default chooser dialog
+     * @param context     Context
+     * @param intent      Intent to open
+     * @param useChooser  Whether or not use default chooser dialog
+     * @param requestCode Request code if activity should be started with {@link Activity#startActivityForResult(android.content.Intent, int)}
+     *                    or null for regular {@link Context#startActivity(android.content.Intent)} call.
+     *                    Note that you should pass Activity as context param if requestCode is not null.
      * @return <code>true<code/> if intent was started
      */
-    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser) {
+    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser, Integer requestCode) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         try {
-            context.startActivity(useChooser ? Intent.createChooser(intent, null) : intent);
+            startActivity(context, useChooser ? Intent.createChooser(intent, null) : intent, requestCode);
             return true;
         } catch (ActivityNotFoundException e) {
             try {
-                context.startActivity(Intent.createChooser(intent, null));
+                startActivity(context, Intent.createChooser(intent, null), requestCode);
                 return true;
             } catch (ActivityNotFoundException e2) {
                 e2.printStackTrace();
                 return false;
             }
+        }
+    }
+
+    private static void startActivity(Context context, Intent intent, Integer requestCode) {
+        if (requestCode == null) {
+            context.startActivity(intent);
+        } else {
+            ((Activity) context).startActivityForResult(intent, requestCode);
         }
     }
 

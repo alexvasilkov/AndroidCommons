@@ -18,6 +18,10 @@ Helper methods to show / hide keyboard and determine keyboard state.
 
 Helper methods to store various values in SharedPreferences.
 
+##### ItemsAdapter & LayoutItemsAdapter #####
+
+BaseAdapter implementations to be used with java.util.List. LayoutItemsAdapter class provides methods to populate any ViewGroup with views from adapter with optional views recycling mechanism.
+
 #### How to build ####
 
 You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file and javadocs will be generated into `target` folder.
