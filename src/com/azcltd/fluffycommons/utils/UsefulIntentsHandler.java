@@ -1,4 +1,4 @@
-package com.azcltd.fluffycommons;
+package com.azcltd.fluffycommons.utils;
 
 import android.content.Context;
 import android.content.Intent;

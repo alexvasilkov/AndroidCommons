@@ -1,4 +1,4 @@
-package com.azcltd.fluffycommons;
+package com.azcltd.fluffycommons.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
