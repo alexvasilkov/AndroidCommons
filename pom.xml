@@ -47,6 +47,12 @@
             <version>4.1.1.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.alexvasilkov</groupId>
+            <artifactId>fluffy-events</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
