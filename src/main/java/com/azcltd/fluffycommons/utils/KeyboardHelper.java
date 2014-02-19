@@ -2,6 +2,7 @@ package com.azcltd.fluffycommons.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
@@ -59,7 +60,10 @@ public final class KeyboardHelper {
 
             @Override
             public void onGlobalLayout() {
-                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+
+                int heightDiff = rootView.getRootView().getHeight() - (r.bottom - r.top);
                 if (mInitialHeightsDiff == -1) {
                     mInitialHeightsDiff = heightDiff;
                 }
