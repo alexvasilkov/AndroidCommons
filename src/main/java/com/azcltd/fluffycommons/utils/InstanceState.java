@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InstanceState {
 
-    public String value();
+    public String value() default "";
 
 }

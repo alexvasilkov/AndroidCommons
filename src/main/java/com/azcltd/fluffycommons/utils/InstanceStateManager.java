@@ -68,6 +68,7 @@ public class InstanceStateManager<T> {
             an = f.getAnnotation(InstanceState.class);
             if (an == null) continue;
             key = an.value();
+            if (key.length() == 0) key = f.getName();
 
             if (key == null || key.length() == 0) {
                 throw new RuntimeException("\"key\" value of InstanceState annotation cannot be empty");
