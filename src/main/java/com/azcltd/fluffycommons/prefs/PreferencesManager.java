@@ -26,6 +26,10 @@ class PreferencesManager<T> {
         new PreferencesManager<T>().initInternal(clazz).removeInternal(clazz);
     }
 
+    static <T> boolean exists(Class<T> clazz) {
+        return getPreferencesForClass(clazz).getBoolean(OBJECT_SAVED_KEY, false);
+    }
+
     private SharedPreferences mPrefs;
     private final HashMap<String, Field> mFieldsMap = new HashMap<String, Field>();
     private final HashMap<Field, String> mKeysMap = new HashMap<Field, String>();
@@ -34,12 +38,7 @@ class PreferencesManager<T> {
     }
 
     private PreferencesManager<T> initInternal(Class<? extends T> clazz) {
-        PreferenceObject objectAn = clazz.getAnnotation(PreferenceObject.class);
-        if (objectAn == null)
-            throw new RuntimeException("Specified object's class should be marked with PreferenceObject annotation");
-        String prefsName = objectAn.value();
-
-        mPrefs = Preferences.prefs(PREFERENCES_NAME + ':' + prefsName);
+        mPrefs = getPreferencesForClass(clazz);
 
         PreferenceField fieldAn;
         String key;
@@ -101,6 +100,17 @@ class PreferencesManager<T> {
         }
         editor.putBoolean(OBJECT_SAVED_KEY, false);
         editor.commit();
+    }
+
+    private static SharedPreferences getPreferencesForClass(Class<?> clazz) {
+        PreferenceObject objectAn = clazz.getAnnotation(PreferenceObject.class);
+        if (objectAn == null)
+            throw new RuntimeException("Specified object's class should be marked with PreferenceObject annotation");
+        String prefsName = objectAn.value();
+        if (prefsName.length() == 0)
+            throw new RuntimeException("PreferenceObject annotation cannot have empty value");
+
+        return Preferences.prefs(PREFERENCES_NAME + ':' + prefsName);
     }
 
     private static void setPrefsValue(Field f, Object obj, SharedPreferences.Editor editor, String key) throws IllegalAccessException {

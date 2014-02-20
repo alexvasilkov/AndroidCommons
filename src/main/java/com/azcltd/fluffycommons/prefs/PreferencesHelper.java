@@ -102,6 +102,7 @@ public class PreferencesHelper {
      * <code>String[]</code>, <code>Date</code>, <code>Serializable</code>
      * <p/>
      * See also {@link com.azcltd.fluffycommons.prefs.Preferences#prefs()}
+     * @param obj Object to be saved, cannot be null
      */
     public static <T> void save(T obj) {
         PreferencesManager.save(obj);
@@ -119,6 +120,13 @@ public class PreferencesHelper {
      */
     public static <T> void remove(Class<T> clazz) {
         PreferencesManager.remove(clazz);
+    }
+
+    /**
+     * Checks if object of this class was already stored
+     */
+    public static boolean exists(Class<?> clazz) {
+        return PreferencesManager.exists(clazz);
     }
 
     /* Helper methods */
