@@ -7,6 +7,10 @@ public abstract class EventsTask extends BackgroundTask<Void> {
     private boolean mIsLoading;
     private boolean mIsLoaded;
 
+    public EventsTask() {
+        super(null);
+    }
+
     protected abstract int getLoadingEventId();
 
     protected abstract int getLoadedEventId();

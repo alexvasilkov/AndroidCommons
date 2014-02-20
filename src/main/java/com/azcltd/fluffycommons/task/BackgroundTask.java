@@ -14,46 +14,38 @@ import java.lang.ref.WeakReference;
 public abstract class BackgroundTask<P> {
 
     private final WeakReference<P> mParentRef;
-    private final boolean mIsSkipCallbacksIfParentIsNull;
+    private boolean mIsSkipCallbacksIfParentIsNull;
     private ATask mTask;
 
     /**
-     * Shortuct for {@link #BackgroundTask(Object, boolean) BackgroundTask(null, false)}
-     */
-    public BackgroundTask() {
-        this(null, false);
-    }
-
-    /**
-     * Shortuct for {@link #BackgroundTask(Object, boolean) BackgroundTask(parent, true)}
+     * @param parent Parent object (i.e. {@link android.app.Activity Activity} or
+     *               {@link android.app.Fragment Fragment}) to be passed to task's lyfecycle
+     *               methods ({@link #onTaskStarted(Object) onTaskStarted},
+     *               {@link #onTaskSuccess(Object) onTaskSuccess},
+     *               {@link #onTaskFail(Object, Exception) onTaskFail}
+     *               or {@link #onTaskEnded(Object) onTaskEnded})
      */
     public BackgroundTask(P parent) {
-        this(parent, true);
-    }
-
-    /**
-     * @param parent                        Parent object (i.e. {@link android.app.Activity Activity} or
-     *                                      {@link android.app.Fragment Fragment}) to be passed to task's lyfecycle
-     *                                      methods ({@link #onTaskStarted(Object) onTaskStarted},
-     *                                      {@link #onTaskSuccess(Object) onTaskSuccess},
-     *                                      {@link #onTaskFail(Object, Exception) onTaskFail}
-     *                                      or {@link #onTaskEnded(Object) onTaskEnded})
-     * @param isSkipCallbacksIfParentIsNull Parent object is saved into {@link java.lang.ref.WeakReference
-     *                                      WeakReference} so it can be erased and we won't
-     *                                      be able to pass it to task's lyfecycle methods. Default behavior is to skip
-     *                                      calling these methods if parent object is <code>null</code> to prevent NPE,
-     *                                      but you can change this if you must be sure that all callback methods are
-     *                                      always called.
-     */
-    public BackgroundTask(P parent, boolean isSkipCallbacksIfParentIsNull) {
         mParentRef = new WeakReference<P>(parent);
-        mIsSkipCallbacksIfParentIsNull = isSkipCallbacksIfParentIsNull;
+        mIsSkipCallbacksIfParentIsNull = (parent == null); // only skipping callbacks if origin parent is null
     }
 
     protected void onTaskStarted(P parent) {
     }
 
     protected abstract void doTask() throws Exception;
+
+    /**
+     * @param skip Parent object is saved into {@link java.lang.ref.WeakReference
+     *             WeakReference} so it can be erased and we won't
+     *             be able to pass it to task's lyfecycle methods. Default behavior is to skip
+     *             calling these methods if parent object is <code>null</code> to prevent NPE,
+     *             but you can change this if you must be sure that all callback methods are
+     *             always called.
+     */
+    protected void setSkipCallbacksIfParentIsNull(boolean skip) {
+        mIsSkipCallbacksIfParentIsNull = skip;
+    }
 
     /**
      * Calls {@link android.os.AsyncTask#publishProgress(Object[]) AsyncTask.publishProgress()} method.
