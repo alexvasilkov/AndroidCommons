@@ -32,19 +32,38 @@ public class FillWidthImageView extends ImageView {
         if (!mIsSkipCurrentLayoutRequest) super.requestLayout();
     }
 
+    private int calculateHeight(int w, float aspect) {
+        int wPadding = getPaddingLeft() + getPaddingRight();
+        int hPadding = getPaddingTop() + getPaddingBottom();
+
+        // Calculating drawable result width and height
+        int dW = w - wPadding;
+        int dH = Math.round((float) dW / aspect);
+
+        return dH + hPadding;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         Drawable drawable = getDrawable();
+
         int w = MeasureSpec.getSize(widthMeasureSpec);
+        int h;
 
         if (drawable == null) {
-            setMeasuredDimension(w, Math.round(w / mAspect));
-        } else if (drawable.getIntrinsicWidth() == 0 || drawable.getIntrinsicHeight() == 0) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            h = calculateHeight(w, mAspect);
         } else {
-            int h = w * drawable.getIntrinsicHeight() / drawable.getIntrinsicWidth();
-            setMeasuredDimension(w, h);
+            int dW = drawable.getIntrinsicWidth();
+            int dH = drawable.getIntrinsicHeight();
+
+            if (dW > 0 && dH > 0) {
+                h = calculateHeight(w, (float) dW / (float) dH);
+            } else {
+                h = calculateHeight(w, mAspect);
+            }
         }
+
+        setMeasuredDimension(w, h);
     }
 
     public void setDefaultEmptyAspect() {
