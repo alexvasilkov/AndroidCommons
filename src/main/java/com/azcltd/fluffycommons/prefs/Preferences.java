@@ -13,6 +13,13 @@ public class Preferences {
     private static String sDefaultPrefsName;
 
     /**
+     * Stores application context for later use.
+     */
+    public static void init(Context context) {
+        sAppContext = context.getApplicationContext();
+    }
+
+    /**
      * Stores application context and default prefs name for later use.
      */
     public static void init(Context context, String defaultPrefsName) {
