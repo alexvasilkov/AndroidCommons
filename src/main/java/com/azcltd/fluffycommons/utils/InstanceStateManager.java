@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -105,7 +108,13 @@ public class InstanceStateManager<T> {
     }
 
     private static void setBundleValue(Field f, Object obj, Bundle bundle, String key) throws IllegalAccessException {
+
         Class<?> type = f.getType();
+        Type[] genericTypes = null;
+        if (f.getGenericType() instanceof ParameterizedType) {
+            genericTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+        }
+
         if (type.equals(Boolean.TYPE)) {
             bundle.putBoolean(key, f.getBoolean(obj));
 
@@ -169,11 +178,18 @@ public class InstanceStateManager<T> {
         } else if (type.equals(String[].class)) {
             bundle.putStringArray(key, (String[]) f.get(obj));
 
-        } else if (Serializable.class.isAssignableFrom(type)) {
-            bundle.putSerializable(key, (Serializable) f.get(obj));
-
         } else if (Parcelable.class.isAssignableFrom(type)) {
             bundle.putParcelable(key, (Parcelable) f.get(obj));
+
+        } else if (type.equals(ArrayList.class) && genericTypes[0] instanceof Class &&
+                Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
+            bundle.putParcelableArrayList(key, (ArrayList<? extends Parcelable>) f.get(obj));
+
+        } else if (type.isArray() && Parcelable.class.isAssignableFrom(type.getComponentType())) {
+            bundle.putParcelableArray(key, (Parcelable[]) f.get(obj));
+
+        } else if (Serializable.class.isAssignableFrom(type)) {
+            bundle.putSerializable(key, (Serializable) f.get(obj));
 
         } else {
             throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getName());
@@ -182,7 +198,13 @@ public class InstanceStateManager<T> {
 
     private static void setInstanceValue(Field f, Object obj, Bundle bundle, String key) throws IllegalArgumentException,
             IllegalAccessException {
+
         Class<?> type = f.getType();
+        Type[] genericTypes = null;
+        if (f.getGenericType() instanceof ParameterizedType) {
+            genericTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+        }
+
         if (type.equals(Boolean.TYPE)) {
             f.setBoolean(obj, bundle.getBoolean(key));
 
@@ -246,11 +268,18 @@ public class InstanceStateManager<T> {
         } else if (type.equals(String[].class)) {
             f.set(obj, bundle.getStringArray(key));
 
-        } else if (Serializable.class.isAssignableFrom(type)) {
-            f.set(obj, bundle.getSerializable(key));
-
         } else if (Parcelable.class.isAssignableFrom(type)) {
             f.set(obj, bundle.getParcelable(key));
+
+        } else if (type.equals(ArrayList.class) && genericTypes[0] instanceof Class &&
+                Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
+            f.set(obj, bundle.getParcelableArrayList(key));
+
+        } else if (type.isArray() && Parcelable.class.isAssignableFrom(type.getComponentType())) {
+            f.set(obj, bundle.getParcelableArray(key));
+
+        } else if (Serializable.class.isAssignableFrom(type)) {
+            f.set(obj, bundle.getSerializable(key));
 
         } else {
             throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getSimpleName());
