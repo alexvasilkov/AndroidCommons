@@ -9,7 +9,7 @@
 
     <groupId>com.alexvasilkov</groupId>
     <artifactId>fluffy-commons</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Fluffy Commons</name>
@@ -20,7 +20,7 @@
         <url>https://github.com/alexvasilkov/fluffy-commons</url>
         <connection>scm:git:git://github.com/alexvasilkov/fluffy-commons.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/alexvasilkov/fluffy-commons.git</developerConnection>
-        <tag>1.0.6</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
