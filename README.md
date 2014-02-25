@@ -2,7 +2,7 @@
 
 Various useful utilities for Android apps development.
 
-API documentation provided as javadocs and will be generated along with jar file. See __How to build__ section.
+API documentation provided as javadocs.
 
 #### Classes ####
 
@@ -24,9 +24,23 @@ Helper methods to show / hide keyboard and determine keyboard state.
 ##### ThreadSafeDateFormatter #####
 Thread safe wrapper for SimpleDateFormatter.
 
+##### TypefaceHelper #####
+Utility to set custom typefaces for all views extending TextView, uses android:tag to store typeface info.
+
+##### Views #####
+Simple utility class to find views within layout with implicit types casting. I.e. `TextView tv = Views.find(layout, R.id.text_view);`
+
+#### Gradle usage ####
+
+`compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
+
 #### How to build ####
 
-You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file and javadocs will be generated into `target` folder.
+You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file will be generated into `target` folder.
+
+#### Change log ####
+
+TODO
 
 #### License ####
 
