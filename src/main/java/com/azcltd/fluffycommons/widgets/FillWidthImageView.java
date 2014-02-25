@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 public class FillWidthImageView extends ImageView {
 
-    private static final float DEFAULT_EMPTY_ASPECT = 16f / 9f;
+    public static final float DEFAULT_EMPTY_ASPECT = 16f / 9f;
 
     private float mAspect = DEFAULT_EMPTY_ASPECT;
     private boolean mIsEmptyAspectSpecified = false;
