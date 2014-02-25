@@ -30,6 +30,9 @@ Utility to set custom typefaces for all views extending TextView, uses android:t
 ##### Views #####
 Simple utility class to find views within layout with implicit types casting. I.e. `TextView tv = Views.find(layout, R.id.text_view);`
 
+##### FillWidthImageView #####
+ImageView that will be scaled to fit entire available width preserving aspect ratio (by adjusting view's height). Is is also possible to set aspect ratio of the image before it is loaded into the view.
+
 #### Gradle usage ####
 
 `compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
@@ -40,7 +43,11 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 #### Change log ####
 
-TODO
+##### 1.0.6: #####
+
+* Added new utilities: TypefaceHelper, Views
+* KeyboardHelper now works with both adjustResize and adjustPan
+* Small API improvements
 
 #### License ####
 
