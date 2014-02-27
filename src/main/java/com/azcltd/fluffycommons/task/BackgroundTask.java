@@ -27,7 +27,7 @@ public abstract class BackgroundTask<P> {
      */
     public BackgroundTask(P parent) {
         mParentRef = new WeakReference<P>(parent);
-        mIsSkipCallbacksIfParentIsNull = (parent == null); // only skipping callbacks if origin parent is null
+        mIsSkipCallbacksIfParentIsNull = (parent != null); // only skipping callbacks if origin parent is null
     }
 
     protected void onTaskStarted(P parent) {
