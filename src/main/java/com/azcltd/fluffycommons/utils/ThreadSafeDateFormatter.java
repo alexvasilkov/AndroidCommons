@@ -17,12 +17,14 @@ public class ThreadSafeDateFormatter {
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     private final String mPattern;
+    private final Locale mLocale;
     private final TimeZone mTz;
     private final DateFormatSymbols mSymbols;
 
     private ThreadLocal<SimpleDateFormat> mFormatter = new ThreadLocal<SimpleDateFormat>() {
         protected SimpleDateFormat initialValue() {
-            SimpleDateFormat formatter = new SimpleDateFormat(mPattern, Locale.getDefault());
+            Locale locale = mLocale == null ? Locale.getDefault() : mLocale;
+            SimpleDateFormat formatter = new SimpleDateFormat(mPattern, locale);
             if (mTz != null) formatter.setTimeZone(mTz);
             if (mSymbols != null) formatter.setDateFormatSymbols(mSymbols);
             return formatter;
@@ -30,19 +32,28 @@ public class ThreadSafeDateFormatter {
     };
 
     public ThreadSafeDateFormatter(String pattern) {
-        this(pattern, null, null);
+        this(pattern, null, null, null);
+    }
+
+    public ThreadSafeDateFormatter(String pattern, Locale locale) {
+        this(pattern, locale, null, null);
     }
 
     public ThreadSafeDateFormatter(String pattern, TimeZone tz) {
-        this(pattern, tz, null);
+        this(pattern, null, tz, null);
     }
 
     public ThreadSafeDateFormatter(String pattern, DateFormatSymbols symbols) {
-        this(pattern, null, symbols);
+        this(pattern, null, null, symbols);
     }
 
-    public ThreadSafeDateFormatter(String pattern, TimeZone tz, DateFormatSymbols symbols) {
+    public ThreadSafeDateFormatter(String pattern, Locale locale, TimeZone tz) {
+        this(pattern, locale, tz, null);
+    }
+
+    public ThreadSafeDateFormatter(String pattern, Locale locale, TimeZone tz, DateFormatSymbols symbols) {
         mPattern = pattern;
+        mLocale = locale;
         mTz = tz;
         mSymbols = symbols;
     }
