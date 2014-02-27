@@ -1,6 +1,7 @@
 package com.azcltd.fluffycommons.utils;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -171,6 +172,9 @@ public class InstanceStateManager<T> {
         } else if (Serializable.class.isAssignableFrom(type)) {
             bundle.putSerializable(key, (Serializable) f.get(obj));
 
+        } else if (Parcelable.class.isAssignableFrom(type)) {
+            bundle.putParcelable(key, (Parcelable) f.get(obj));
+
         } else {
             throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getName());
         }
@@ -244,6 +248,9 @@ public class InstanceStateManager<T> {
 
         } else if (Serializable.class.isAssignableFrom(type)) {
             f.set(obj, bundle.getSerializable(key));
+
+        } else if (Parcelable.class.isAssignableFrom(type)) {
+            f.set(obj, bundle.getParcelable(key));
 
         } else {
             throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getSimpleName());

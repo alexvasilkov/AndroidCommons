@@ -76,6 +76,11 @@ public class FillWidthImageView extends ImageView {
         setEmptyAspectInternal((float) width / (float) height);
     }
 
+    public void setEmptyAspect(float aspect) {
+        mIsEmptyAspectSpecified = true;
+        setEmptyAspectInternal(aspect);
+    }
+
     private void setEmptyAspectInternal(float aspect) {
         if (aspect <= 0) throw new IllegalArgumentException("Aspect cannot be <= 0");
         mAspect = aspect;
