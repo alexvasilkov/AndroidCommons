@@ -158,18 +158,27 @@ public class UsefulIntents {
      * Opens chooser dialog with all apps that can share the text.
      * Uses Intent.ACTION_SEND action and "plain/text" mime type.
      *
-     * @param context Context
-     * @param title   Use null for no title
-     * @param text    Text to share
+     * @param context      Context
+     * @param title        Use null for no title
+     * @param text         Text to share
+     * @param chooserTitle Title for chooser dialog
      */
-    public static void share(Context context, String title, String text) {
+    public static void share(Context context, String title, String text, CharSequence chooserTitle) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType(MIME_TYPE_TEXT);
 
         if (title != null) intent.putExtra(Intent.EXTRA_SUBJECT, title);
         intent.putExtra(Intent.EXTRA_TEXT, text);
 
-        startExternalActivity(context, intent, true);
+        startExternalActivity(context, intent, true, chooserTitle, null);
+    }
+
+    /**
+     * Shortcut for {@link #share(android.content.Context, String, String, java.lang.CharSequence)
+     * share(context, title, text, null)}
+     */
+    public static void share(Context context, String title, String text) {
+        share(context, title, text, null);
     }
 
     /**
@@ -194,15 +203,15 @@ public class UsefulIntents {
     public static void pickPhoneNumber(Activity activity, int requestCode) {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-        startExternalActivity(activity, intent, false, requestCode);
+        startExternalActivity(activity, intent, false, null, requestCode);
     }
 
     /**
-     * Shortcut to {@link #startExternalActivity(android.content.Context, android.content.Intent, boolean, Integer)
+     * Shortcut to {@link #startExternalActivity(android.content.Context, android.content.Intent, boolean, java.lang.CharSequence, Integer)
      * startExternalActivity(context, intent, useChooser, null)}
      */
     public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser) {
-        return startExternalActivity(context, intent, useChooser, null);
+        return startExternalActivity(context, intent, useChooser, null, null);
     }
 
     /**
@@ -210,22 +219,24 @@ public class UsefulIntents {
      * If useChooser == false but there were no activities to handle given intent chooser will be used to show empty dialog.<br/>
      * Flag FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET will be added to given intent to properly handle external activities.
      *
-     * @param context     Context
-     * @param intent      Intent to open
-     * @param useChooser  Whether or not use default chooser dialog
-     * @param requestCode Request code if activity should be started with {@link Activity#startActivityForResult(android.content.Intent, int)}
-     *                    or null for regular {@link Context#startActivity(android.content.Intent)} call.
-     *                    Note that you should pass Activity as context param if requestCode is not null.
+     * @param context      Context
+     * @param intent       Intent to open
+     * @param useChooser   Whether or not use default chooser dialog
+     * @param chooserTitle Title for chooser dialog
+     * @param requestCode  Request code if activity should be started with {@link Activity#startActivityForResult(android.content.Intent, int)}
+     *                     or null for regular {@link Context#startActivity(android.content.Intent)} call.
+     *                     Note that you should pass Activity as context param if requestCode is not null.
      * @return <code>true<code/> if intent was started
      */
-    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser, Integer requestCode) {
+    public static boolean startExternalActivity(Context context, Intent intent, boolean useChooser,
+                                                CharSequence chooserTitle, Integer requestCode) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         try {
-            startActivity(context, useChooser ? Intent.createChooser(intent, null) : intent, requestCode);
+            startActivity(context, useChooser ? Intent.createChooser(intent, chooserTitle) : intent, requestCode);
             return true;
         } catch (ActivityNotFoundException e) {
             try {
-                startActivity(context, Intent.createChooser(intent, null), requestCode);
+                startActivity(context, Intent.createChooser(intent, chooserTitle), requestCode);
                 return true;
             } catch (ActivityNotFoundException e2) {
                 e2.printStackTrace();
