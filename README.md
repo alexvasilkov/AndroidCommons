@@ -33,6 +33,9 @@ Simple utility class to find views within layout with implicit types casting. I.
 ##### FillWidthImageView #####
 ImageView that will be scaled to fit entire available width preserving aspect ratio (by adjusting view's height). Is is also possible to set aspect ratio of the image before it is loaded into the view.
 
+##### Convertable & ConvertUtils #####
+Helper utils to convert one set of objects into another
+
 #### Gradle usage ####
 
 `compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
@@ -42,6 +45,18 @@ ImageView that will be scaled to fit entire available width preserving aspect ra
 You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file will be generated into `target` folder.
 
 #### Change log ####
+
+##### 1.0.8-SNAPSHOT: #####
+
+* Added converting utils (Convertable & ConvertUtils)
+* Support for chooser dialog title in UsefulIntents (for `share` method)
+* Small API improvements
+
+##### 1.0.7: #####
+
+* Added new Preconditions utility
+* Parcelable support for InstanceStateManager
+* Bugs fixes
 
 ##### 1.0.6: #####
 
