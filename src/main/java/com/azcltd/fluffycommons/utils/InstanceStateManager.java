@@ -107,6 +107,7 @@ public class InstanceStateManager<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void setBundleValue(Field f, Object obj, Bundle bundle, String key) throws IllegalAccessException {
 
         Class<?> type = f.getType();

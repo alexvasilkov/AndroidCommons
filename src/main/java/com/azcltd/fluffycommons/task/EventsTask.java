@@ -1,5 +1,6 @@
 package com.azcltd.fluffycommons.task;
 
+import android.os.Bundle;
 import com.azcltd.fluffyevents.EventsBus;
 
 public abstract class EventsTask extends BackgroundTask<Void> {
@@ -14,6 +15,10 @@ public abstract class EventsTask extends BackgroundTask<Void> {
     protected abstract int getLoadingEventId();
 
     protected abstract int getLoadedEventId();
+
+    protected Bundle getLoadedEventBundle() {
+        return null;
+    }
 
     @Override
     public void exec() {
@@ -45,7 +50,7 @@ public abstract class EventsTask extends BackgroundTask<Void> {
         EventsBus.removeSticky(getLoadingEventId());
         mIsLoading = false;
 
-        if (isTaskLoaded()) EventsBus.send(getLoadedEventId());
+        if (isTaskLoaded()) EventsBus.send(getLoadedEventId(), getLoadedEventBundle());
     }
 
 }
