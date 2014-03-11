@@ -1,4 +1,4 @@
-package com.azcltd.fluffycommons.task;
+package com.azcltd.fluffycommons.tasks;
 
 import android.os.Bundle;
 import com.azcltd.fluffyevents.EventsBus;

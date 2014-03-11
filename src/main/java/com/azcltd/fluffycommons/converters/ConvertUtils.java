@@ -1,4 +1,4 @@
-package com.azcltd.fluffycommons.converter;
+package com.azcltd.fluffycommons.converters;
 
 import android.util.Log;
 

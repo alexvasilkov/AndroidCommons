@@ -33,6 +33,8 @@ public class AdvancedDateFormatter extends SimpleDateFormat {
             value = m.group(2);
             if ("lower".equals(command)) {
                 m.appendReplacement(result, value.toLowerCase());
+            } else if ("upper".equals(command)) {
+                m.appendReplacement(result, value.toUpperCase());
             }
         }
         m.appendTail(result);
