@@ -36,10 +36,6 @@ ImageView that will be scaled to fit entire available width preserving aspect ra
 ##### Convertable & ConvertUtils #####
 Helper utils to convert one set of objects into another
 
-##### RequestsHelper & RequestsBuilder #####
-Helper utils to load and parse data from web services.
-Latest OkHttp & Gson libraries are required.
-
 #### Gradle usage ####
 
 `compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
@@ -52,7 +48,6 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 ##### 1.0.8-SNAPSHOT: #####
 
-* Added RequestsHelper & RequestsBuilder utils
 * Added converting utils (Convertable & ConvertUtils)
 * Support for chooser dialog title in UsefulIntents (for `share` method)
 * Small API improvements
