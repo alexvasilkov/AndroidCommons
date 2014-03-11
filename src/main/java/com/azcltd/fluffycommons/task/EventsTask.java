@@ -38,7 +38,7 @@ public abstract class EventsTask extends BackgroundTask<Void> {
     }
 
     @Override
-    protected final void onTaskSuccess(Void parent) {
+    protected void onTaskSuccess(Void parent) {
         super.onTaskSuccess(parent);
         mIsLoaded = true;
     }
