@@ -50,8 +50,8 @@
         <dependency>
             <groupId>com.alexvasilkov</groupId>
             <artifactId>fluffy-events</artifactId>
-            <version>1.0.1</version>
-            <scope>provided</scope>
+            <version>1.0.2</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
