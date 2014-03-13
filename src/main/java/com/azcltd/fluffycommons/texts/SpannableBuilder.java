@@ -61,6 +61,11 @@ public class SpannableBuilder {
         return new Style(mAppContext, this);
     }
 
+    public SpannableBuilder clearStyle() {
+        mCurrentStyle = null;
+        return this;
+    }
+
     public SpannableBuilder append(int stringId) {
         return append(stringId, null);
     }
