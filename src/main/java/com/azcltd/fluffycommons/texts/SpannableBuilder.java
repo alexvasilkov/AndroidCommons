@@ -9,19 +9,20 @@ import android.text.style.ClickableSpan;
 import android.text.style.MetricAffectingSpan;
 import android.util.TypedValue;
 import android.view.View;
+import com.azcltd.fluffycommons.utils.AppContext;
 
 /**
- * SpannableStringBuilder implementation that allows applying various text styles to single TextView.
+ * SpannableStringBuilder wrapper that allows applying various text styles to single TextView.
  * <p/>
  * Usage example:<br/>
  * <pre>
- * SpannableBuilder text = new SpannableBuilder(this)
+ * CharSequence text = new SpannableBuilder(this)
  *   .createStyle().setFont("fonts/blessed-day.otf").setColor(Color.RED).setSize(25).apply()
  *   .append("Part1 ")
  *   .currentStyle().setColor(Color.GREEN).setUnderline(true).apply()
  *   .append("Part2 ")
  *   .createStyle().setColor(Color.BLUE).apply()
- *   .append("Part3")
+ *   .append("Part3").build();
  *
  * textView.setText(text);
  * </pre>
@@ -30,18 +31,25 @@ import android.view.View;
  * Part2 will use custom font, green color, 25sp font size and underline;
  * Part3 will use blue color only.
  */
-public class SpannableBuilder extends SpannableStringBuilder {
+public class SpannableBuilder {
 
-    private Context mAppContext;
-    private OnSpanClickListener mClickListener;
+    private final SpannableStringBuilder mBuilder = new SpannableStringBuilder();
+
+    private final Context mAppContext;
+    private final OnSpanClickListener mClickListener;
+
     private Style mCurrentStyle;
 
+    public SpannableBuilder() {
+        this(AppContext.get());
+    }
+
     public SpannableBuilder(Context appContext) {
-        mAppContext = appContext;
+        this(appContext, null);
     }
 
     public SpannableBuilder(Context appContext, OnSpanClickListener clickListener) {
-        mAppContext = appContext;
+        mAppContext = appContext.getApplicationContext();
         mClickListener = clickListener;
     }
 
@@ -53,7 +61,14 @@ public class SpannableBuilder extends SpannableStringBuilder {
         return new Style(mAppContext, this);
     }
 
-    @Override
+    public SpannableBuilder append(int stringId) {
+        return append(stringId, null);
+    }
+
+    public SpannableBuilder append(int stringId, Object clickObject) {
+        return append(mAppContext.getString(stringId), clickObject);
+    }
+
     public SpannableBuilder append(CharSequence text) {
         return append(text, null);
     }
@@ -61,8 +76,8 @@ public class SpannableBuilder extends SpannableStringBuilder {
     public SpannableBuilder append(CharSequence str, final Object clickObject) {
         if (str == null || str.length() == 0) return this;
 
-        int length = length();
-        super.append(str);
+        int length = mBuilder.length();
+        mBuilder.append(str);
 
         if (clickObject != null && mClickListener != null) {
             ClickableSpan clickSpan = new ClickableSpan() {
@@ -71,15 +86,19 @@ public class SpannableBuilder extends SpannableStringBuilder {
                     mClickListener.onSpanClicked(clickObject);
                 }
             };
-            setSpan(clickSpan, length, length + str.length(), SPAN_INCLUSIVE_EXCLUSIVE);
+            mBuilder.setSpan(clickSpan, length, length + str.length(), SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
         if (mCurrentStyle != null) {
             Span span = new Span(mCurrentStyle);
-            setSpan(span, length, length + str.length(), SPAN_INCLUSIVE_EXCLUSIVE);
+            mBuilder.setSpan(span, length, length + str.length(), SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
         return this;
+    }
+
+    public CharSequence build() {
+        return mBuilder;
     }
 
     private static class Span extends MetricAffectingSpan {
