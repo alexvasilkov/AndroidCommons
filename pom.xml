@@ -9,7 +9,7 @@
 
     <groupId>com.alexvasilkov</groupId>
     <artifactId>fluffy-commons</artifactId>
-    <version>1.0.9.2-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Fluffy Commons</name>
