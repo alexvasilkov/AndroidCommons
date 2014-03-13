@@ -24,8 +24,8 @@ Helper methods to show / hide keyboard and determine keyboard state.
 ##### ThreadSafeDateFormatter #####
 Thread safe wrapper for SimpleDateFormatter.
 
-##### TypefaceHelper #####
-Utility to set custom typefaces for all views extending TextView, uses android:tag to store typeface info.
+##### Fonts #####
+Utility to set custom fonts for all views extending TextView, uses android:tag to store font info.
 
 ##### Views #####
 Simple utility class to find views within layout with implicit types casting. I.e. `TextView tv = Views.find(layout, R.id.text_view);`
@@ -40,6 +40,9 @@ Helper utils to convert one set of objects into another
 AdvancedDateFormatter extends SimpleDateFormatter and adds some postprocessing commands. I.e. pattern `'{lower:'MMMM'}' d` will lower month name.
 Only `lower` and `upper` command are supported right now.
 
+##### SpannableBuilder #####
+SpannableStringBuilder implementation that helps applying various text styles to single TextView.
+
 #### Gradle usage ####
 
 `compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
@@ -50,7 +53,13 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 #### Change log ####
 
-##### 1.0.8-SNAPSHOT: #####
+##### 1.0.9-SNAPSHOT: #####
+
+* TypefaceHelper reworked into Fonts class with dynamic fonts caching.
+* Added SpannableBuilder class to apply various dynamic styles to single TextView.
+* Added AppContext class - static holder for application context.
+
+##### 1.0.8: #####
 
 * Added AdvancedDateFormatter class
 * Added converting utils (Convertable & ConvertUtils)

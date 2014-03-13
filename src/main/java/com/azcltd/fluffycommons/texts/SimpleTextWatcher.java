@@ -1,4 +1,4 @@
-package com.azcltd.fluffycommons.utils;
+package com.azcltd.fluffycommons.texts;
 
 import android.text.Editable;
 import android.text.TextWatcher;

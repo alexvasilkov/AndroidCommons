@@ -79,7 +79,10 @@ public class UsefulIntents {
      *
      * @param context Context
      * @param content SMS content
+     * @deprecated With inroduction of Hangouts as sms app in KitKat this method will not work anymore.
+     * Use {@link #share(android.content.Context, String, String, CharSequence) share} method instead.
      */
+    @Deprecated
     public static void sendSms(Context context, String content) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setType("vnd.android-dir/mms-sms");
@@ -205,6 +208,8 @@ public class UsefulIntents {
         intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
         startExternalActivity(activity, intent, false, null, requestCode);
     }
+
+    /* Helper methods */
 
     /**
      * Shortcut to {@link #startExternalActivity(android.content.Context, android.content.Intent, boolean, java.lang.CharSequence, Integer)
