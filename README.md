@@ -55,6 +55,8 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 ##### 1.0.9-SNAPSHOT: #####
 
+* Added ConnectivityHelper class - provides simple API to listen for network connectivity events.
+* Added TelephonyHelper class - provides API to listen for SIM state and check telephony abilities.
 * TypefaceHelper reworked into Fonts class with dynamic fonts caching.
 * Added SpannableBuilder class to apply various dynamic styles to single TextView.
 * Added AppContext class - static holder for application context.
