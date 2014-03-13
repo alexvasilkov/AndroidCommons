@@ -10,6 +10,13 @@ import android.net.NetworkInfo.State;
 
 import java.util.HashMap;
 
+/**
+ * Connectivity helper, provides simple API to listen to network connected / disconnected state.
+ * <p/>
+ * You can also use {@link #isConnected()} method, but you'll need to register defaul listener first with {@link #registerDefault(android.content.Context)}.
+ * <p/>
+ * Requires <code>android.permission.ACCESS_NETWORK_STATE</code> permission
+ */
 public final class ConnectivityHelper {
 
     private static HashMap<String, ConnectivityReceiver> sReceiversMap = new HashMap<String, ConnectivityReceiver>();
@@ -19,6 +26,7 @@ public final class ConnectivityHelper {
      * Be sure to remove receiver at appropriate time (i.e. in Activity.onPause()).
      */
     public static synchronized void register(Context context, ConnectivityListener listener) {
+
         ConnectivityReceiver receiver = new ConnectivityReceiver(listener);
         sReceiversMap.put(context.toString(), receiver);
 
@@ -31,7 +39,7 @@ public final class ConnectivityHelper {
     }
 
     public static synchronized void registerDefault(Context appContext) {
-        register(appContext, new ConnectivityListener() {
+        register(appContext.getApplicationContext(), new ConnectivityListener() {
             @Override
             public void onConnectionLost() {
                 if (sIsConnected) {
@@ -94,6 +102,7 @@ public final class ConnectivityHelper {
 
     }
 
-    private ConnectivityHelper() {}
+    private ConnectivityHelper() {
+    }
 
 }
