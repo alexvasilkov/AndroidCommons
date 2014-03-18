@@ -53,7 +53,11 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 #### Change log ####
 
-##### 1.0.9-SNAPSHOT: #####
+##### 1.0.10-SNAPSHOT: #####
+
+* Added ISO8601DateFormatter utility class
+
+##### 1.0.9: #####
 
 * Added ConnectivityHelper class - provides simple API to listen for network connectivity events.
 * Added TelephonyHelper class - provides API to listen for SIM state and check telephony abilities.
