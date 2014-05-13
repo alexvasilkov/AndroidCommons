@@ -2,6 +2,8 @@ package com.alexvasilkov.fluffycommons.utils;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Telephony;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
@@ -35,7 +37,19 @@ public final class TelephonyHelper {
         return TelephonyManager.SIM_STATE_READY == tm.getSimState() && (TelephonyManager.PHONE_TYPE_NONE != tm.getPhoneType());
     }
 
-	private static class SimStateListener extends PhoneStateListener {
+    public static boolean canSendSms(Context context) {
+        if (!canPerformCall(context)) return false;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            String defaultSmsPackageName = Telephony.Sms.getDefaultSmsPackage(context);
+            return defaultSmsPackageName != null;
+        } else {
+            return true;
+        }
+    }
+
+
+    private static class SimStateListener extends PhoneStateListener {
 
 		private OnSimStateListener mListener;
 		private ServiceState mServiceState;
