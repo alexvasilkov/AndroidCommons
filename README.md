@@ -60,6 +60,7 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 * UsefulIntents now uses fluent API
 * Added `openYouTube` method to UsefulIntents. Fixed `sendSms` method
 * Project converted from maven to gradle
+* **Package renamed from com.azcltd to com.alexvasilkov**
 
 ##### 1.0.9: #####
 
