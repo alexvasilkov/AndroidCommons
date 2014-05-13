@@ -56,6 +56,10 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 ##### 1.0.10-SNAPSHOT: #####
 
 * Added ISO8601DateFormatter utility class
+* Added PropertiesReader utility method to read *.properties file to map
+* UsefulIntents now uses fluent API
+* Added `openYouTube` method to UsefulIntents. Fixed `sendSms` method
+* Project converted from maven to gradle
 
 ##### 1.0.9: #####
 
