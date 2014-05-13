@@ -4,6 +4,12 @@ Various useful utilities for Android apps development.
 
 API documentation provided as javadocs.
 
+#### Usage ####
+
+Add dependency to your build.gradle file:
+
+    compile 'com.alexvasilkov:fluffy-commons:1.1.1'
+
 #### Classes ####
 
 ##### Preferences & PreferencesHelper #####
@@ -53,10 +59,10 @@ You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn c
 
 #### Change log ####
 
-##### 1.0.10-SNAPSHOT: #####
+##### 1.1.1: #####
 
 * Added ISO8601DateFormatter utility class
-* Added PropertiesReader utility method to read *.properties file to map
+* Added PropertiesMap utility class to read *.properties file to map
 * UsefulIntents now uses fluent API
 * Added `openYouTube` method to UsefulIntents. Fixed `sendSms` method
 * Project converted from maven to gradle
