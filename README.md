@@ -49,14 +49,6 @@ Only `lower` and `upper` command are supported right now.
 ##### SpannableBuilder #####
 SpannableStringBuilder implementation that helps applying various text styles to single TextView.
 
-#### Gradle usage ####
-
-`compile 'com.alexvasilkov:fluffy-commons:{latest version}'`
-
-#### How to build ####
-
-You need [Maven](http://maven.apache.org/) to build the project. Just run `mvn clean install` from project's root, jar file will be generated into `target` folder.
-
 #### Change log ####
 
 ##### 1.1.1: #####
