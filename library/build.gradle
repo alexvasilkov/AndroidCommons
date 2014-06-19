@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.10.+'
     }
 }
 
@@ -37,6 +37,7 @@ sourceSets {
 
 dependencies {
     provided 'com.alexvasilkov:fluffy-events:1.0.2'
+    provided 'com.android.support:support-v4:19.0.1'
 }
 
 apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
