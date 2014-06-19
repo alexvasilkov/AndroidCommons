@@ -1,4 +1,6 @@
-### Fluffy Commons ###
+### Android Commons ###
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.alexvasilkov/android-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.alexvasilkov/android-commons)
 
 Various useful utilities for Android apps development.
 
@@ -8,7 +10,7 @@ API documentation provided as javadocs.
 
 Add dependency to your build.gradle file:
 
-    compile 'com.alexvasilkov:fluffy-commons:1.1.1'
+    compile 'com.alexvasilkov:android-commons:1.2.0'
 
 #### Classes ####
 
@@ -50,6 +52,14 @@ Only `lower` and `upper` command are supported right now.
 SpannableStringBuilder implementation that helps applying various text styles to single TextView.
 
 #### Change log ####
+
+##### 1.2.0: #####
+
+* Project renamed to AndroidCommons
+* **Package renamed from com.alexvasilkov.fluffycommons to com.alexvasilkov.android.commons**
+* Added NavHelper utility class
+* Views class expanded
+* UsefulIntents class renamed into Intents
 
 ##### 1.1.1: #####
 
