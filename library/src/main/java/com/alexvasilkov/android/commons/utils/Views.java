@@ -42,21 +42,23 @@ public final class Views {
         return getParams(view);
     }
 
-    public static View inflate(Context context, int layoutId) {
-        return LayoutInflater.from(context).inflate(layoutId, null, false);
+    @SuppressWarnings("unchecked")
+    public static <T extends View> T inflate(Context context, int layoutId) {
+        return (T) LayoutInflater.from(context).inflate(layoutId, null, false);
     }
 
-    public static View inflate(View root, int layoutId) {
+    public static <T extends View> T inflate(View root, int layoutId) {
         return inflateInternal(root, layoutId, false);
     }
 
-    public static View inflateAndAttach(View root, int layoutId) {
+    public static <T extends View> T inflateAndAttach(View root, int layoutId) {
         return inflateInternal(root, layoutId, true);
     }
 
-    private static View inflateInternal(View root, int layoutId, boolean attach) {
+    @SuppressWarnings("unchecked")
+    private static <T extends View> T inflateInternal(View root, int layoutId, boolean attach) {
         if (root == null) throw new NullPointerException("Root view cannot be null");
-        return LayoutInflater.from(root.getContext()).inflate(layoutId, (ViewGroup) root, attach);
+        return (T) LayoutInflater.from(root.getContext()).inflate(layoutId, (ViewGroup) root, attach);
     }
 
     private Views() {

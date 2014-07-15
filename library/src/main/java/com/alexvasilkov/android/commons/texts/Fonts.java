@@ -94,6 +94,13 @@ public final class Fonts {
         setTypeface(textView, getFontFromString(textView.getContext().getAssets(), fontPath, true));
     }
 
+    /**
+     * Applies font to TextView basing on it's tag value.
+     */
+    public static void set(TextView textView) {
+        set(textView, (String) textView.getTag());
+    }
+
     /* Internal methods */
 
     private static void setTypeface(TextView textView, AssetManager assets, boolean strict) {
