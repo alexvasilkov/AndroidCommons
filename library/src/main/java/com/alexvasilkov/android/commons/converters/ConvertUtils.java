@@ -5,27 +5,39 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ConvertUtils {
 
     /**
-     * Converting array of convertable items into ArrayList of target items
+     * Converting value if it is not null
+     */
+    public static <T, P extends Convertable<T>> T convert(P value) throws ParseException {
+        return value == null ? null : value.convert();
+    }
+
+    /**
+     * Converting array of convertable items into ArrayList of target items.
+     * Note: per item ParseException are ignored.
      *
      * @param array Array to convert
      */
     public static <T, J extends Convertable<T>> ArrayList<T> convertToList(J[] array) {
         if (array == null) return null;
+
         ArrayList<T> list = new ArrayList<T>(array.length);
+
         for (J json : array) {
             try {
-                T item = json.convert();
+                T item = json == null ? null : json.convert();
                 if (item != null) list.add(item);
             } catch (ParseException e) {
                 Log.e("ConvertUtils", "Error converting item (" + json.getClass().getSimpleName() + ") : "
                         + e.getMessage());
             }
         }
+
         return list;
     }
 
@@ -46,7 +58,7 @@ public class ConvertUtils {
     }
 
     /**
-     * Searches for enum of given class with given name (ingnoring case)
+     * Searches for enum of given class with given name (case insensitive)
      *
      * @param type         Enum class
      * @param name         Enum constant name
@@ -60,6 +72,45 @@ public class ConvertUtils {
         }
 
         return defaultValue;
+    }
+
+    /**
+     * Creates output object using provided creator. Returns null if obj null.
+     */
+    public static <IN, OUT> OUT create(IN obj, Creator<IN, OUT> creator) {
+        return obj == null ? null : creator.create(obj);
+    }
+
+    /**
+     * Creates list of output objects using provided creator
+     */
+    public static <IN, OUT> List<OUT> create(IN[] arr, Creator<IN, OUT> creator) {
+        if (arr == null) return null;
+
+        ArrayList<OUT> list = new ArrayList<OUT>(arr.length);
+
+        for (IN value : arr) {
+            OUT item = value == null ? null : creator.create(value);
+            if (item != null) list.add(item);
+        }
+
+        return list;
+    }
+
+    /**
+     * Creates list of output objects using provided creator
+     */
+    public static <IN, OUT> List<OUT> create(Collection<IN> collection, Creator<IN, OUT> creator) {
+        if (collection == null) return null;
+
+        ArrayList<OUT> list = new ArrayList<OUT>(collection.size());
+
+        for (IN value : collection) {
+            OUT item = value == null ? null : creator.create(value);
+            if (item != null) list.add(item);
+        }
+
+        return list;
     }
 
     /**
