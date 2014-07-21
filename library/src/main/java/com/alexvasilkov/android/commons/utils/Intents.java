@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.provider.Telephony;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -108,6 +109,19 @@ public class Intents {
 
             Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
             intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+            return open(intent);
+        }
+
+        /**
+         * Opens gallery image picker activity. You can get picked image's Uri using {@link android.content.Intent#getData()}
+         * inside {@link android.app.Activity#onActivityResult(int, int, android.content.Intent)} method.
+         */
+        public boolean pickPhotoFromGallery() {
+            if (requestCode == null)
+                throw new NullPointerException("Activity request code is required when picking image");
+
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
             return open(intent);
         }
 

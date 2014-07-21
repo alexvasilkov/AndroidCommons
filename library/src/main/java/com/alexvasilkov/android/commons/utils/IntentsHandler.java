@@ -7,15 +7,19 @@ import android.provider.ContactsContract;
 
 public class IntentsHandler {
 
+    /**
+     * Call this method from {@link android.app.Activity#onActivityResult(int, int, android.content.Intent)} method to
+     * get picked contact info.
+     */
     public static ContactInfo onPickPhoneResult(Context context, Intent data) {
         if (data == null || data.getData() == null) return null;
 
         Cursor c = null;
         try {
             c = context.getContentResolver().query(data.getData(), new String[]{
-                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                    ContactsContract.CommonDataKinds.Phone.NUMBER},
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                            ContactsContract.CommonDataKinds.Phone.NUMBER},
                     null, null, null);
 
             if (c != null && c.moveToFirst()) {
