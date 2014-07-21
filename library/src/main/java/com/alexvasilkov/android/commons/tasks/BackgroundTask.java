@@ -81,6 +81,10 @@ public abstract class BackgroundTask<P> {
         }
     }
 
+    public void cancel(boolean mayInterruptIfRunning) {
+        if (mTask != null) mTask.cancel(mayInterruptIfRunning);
+    }
+
     private class ATask extends AsyncTask<Void, Void, Void> {
 
         private Exception mException;
