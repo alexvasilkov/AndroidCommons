@@ -1,4 +1,4 @@
-package com.alexvasilkov.android.commons.utils;
+package com.alexvasilkov.android.commons.state;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -49,6 +49,7 @@ public class InstanceStateManager<T> {
 
     private T mObj;
     private final HashMap<String, Field> mFieldsMap = new HashMap<String, Field>();
+    private final HashMap<String, Boolean> mIsGsonMap = new HashMap<String, Boolean>();
     private final HashMap<Field, String> mKeysMap = new HashMap<Field, String>();
 
     private InstanceStateManager(T obj) {
@@ -65,22 +66,27 @@ public class InstanceStateManager<T> {
     }
 
     private void addFields(Field[] fields) {
-        InstanceState an;
         String key;
+        boolean isGson;
 
         for (Field f : fields) {
-            an = f.getAnnotation(InstanceState.class);
-            if (an == null) continue;
-            key = an.value();
-            if (key.length() == 0) key = f.getName();
+            if (f.getAnnotation(InstanceState.class) != null) {
+                isGson = false;
+            } else if (f.getAnnotation(InstanceStateGson.class) != null) {
+                if (!GsonHelper.hasGson())
+                    throw new RuntimeException("Gson library not found for InstanceStateGson annotation");
+                isGson = true;
+            } else {
+                continue;
+            }
+            key = f.getName();
 
-            if (key == null || key.length() == 0) {
-                throw new RuntimeException("\"key\" value of InstanceState annotation cannot be empty");
-            } else if (mFieldsMap.containsKey(key)) {
+            if (mFieldsMap.containsKey(key)) {
                 throw new RuntimeException("Duplicate key \"" + key + "\" of InstanceState annotation");
             } else {
                 f.setAccessible(true); // removing private fields access restriction
                 mFieldsMap.put(key, f);
+                mIsGsonMap.put(key, isGson);
                 mKeysMap.put(f, key);
             }
         }
@@ -88,8 +94,10 @@ public class InstanceStateManager<T> {
 
     private Bundle saveState(Bundle outState) {
         try {
+            String key;
             for (Field f : mKeysMap.keySet()) {
-                setBundleValue(f, mObj, outState, PREFIX + mKeysMap.get(f));
+                key = mKeysMap.get(f);
+                setBundleValue(f, mObj, outState, PREFIX + key, mIsGsonMap.get(key));
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Can't access field value", e);
@@ -99,8 +107,10 @@ public class InstanceStateManager<T> {
 
     private void restoreState(Bundle savedInstanceState) {
         try {
+            String key;
             for (Field f : mKeysMap.keySet()) {
-                setInstanceValue(f, mObj, savedInstanceState, PREFIX + mKeysMap.get(f));
+                key = mKeysMap.get(f);
+                setInstanceValue(f, mObj, savedInstanceState, PREFIX + key, mIsGsonMap.get(key));
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Can't set field value", e);
@@ -108,7 +118,13 @@ public class InstanceStateManager<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private static void setBundleValue(Field f, Object obj, Bundle bundle, String key) throws IllegalAccessException {
+    private static void setBundleValue(Field f, Object obj, Bundle bundle, String key, boolean isGson)
+            throws IllegalAccessException {
+
+        if (isGson) {
+            bundle.putString(key, GsonHelper.get().toJson(f.get(obj)));
+            return;
+        }
 
         Class<?> type = f.getType();
         Type[] genericTypes = null;
@@ -197,10 +213,16 @@ public class InstanceStateManager<T> {
         }
     }
 
-    private static void setInstanceValue(Field f, Object obj, Bundle bundle, String key) throws IllegalArgumentException,
-            IllegalAccessException {
+    private static void setInstanceValue(Field f, Object obj, Bundle bundle, String key, boolean isGson)
+            throws IllegalArgumentException, IllegalAccessException {
+
+        if (isGson) {
+            f.set(obj, GsonHelper.get().fromJson(bundle.getString(key), f.getGenericType()));
+            return;
+        }
 
         Class<?> type = f.getType();
+
         Type[] genericTypes = null;
         if (f.getGenericType() instanceof ParameterizedType) {
             genericTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();

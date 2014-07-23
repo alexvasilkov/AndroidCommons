@@ -38,6 +38,7 @@ sourceSets {
 dependencies {
     provided 'com.alexvasilkov:fluffy-events:1.0.2'
     provided 'com.android.support:support-v4:19.1.0'
+    provided 'com.google.code.gson:gson:2.+'
 }
 
 apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
