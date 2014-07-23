@@ -2,6 +2,7 @@ package com.alexvasilkov.android.commons.state;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import com.alexvasilkov.android.commons.utils.GsonHelper;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -122,7 +123,7 @@ public class InstanceStateManager<T> {
             throws IllegalAccessException {
 
         if (isGson) {
-            bundle.putString(key, GsonHelper.get().toJson(f.get(obj)));
+            bundle.putString(key, GsonHelper.toJson(f.get(obj)));
             return;
         }
 
@@ -217,7 +218,7 @@ public class InstanceStateManager<T> {
             throws IllegalArgumentException, IllegalAccessException {
 
         if (isGson) {
-            f.set(obj, GsonHelper.get().fromJson(bundle.getString(key), f.getGenericType()));
+            f.set(obj, GsonHelper.fromJson(bundle.getString(key), f.getGenericType()));
             return;
         }
 

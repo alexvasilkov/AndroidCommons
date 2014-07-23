@@ -2,8 +2,10 @@ package com.alexvasilkov.android.commons.prefs;
 
 import android.content.SharedPreferences;
 import android.util.Base64;
+import com.alexvasilkov.android.commons.utils.GsonHelper;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.Date;
 
 /**
@@ -87,6 +89,28 @@ public class PreferencesHelper {
     }
 
     /**
+     * Retrieves object stored as json encoded string.
+     */
+    public static <T> T getJson(SharedPreferences prefs, String key, Class<T> clazz) {
+        return getJson(prefs, key, (Type) clazz);
+    }
+
+    /**
+     * Retrieves object stored as json encoded string.
+     */
+    public static <T> T getJson(SharedPreferences prefs, String key, Type type) {
+        return GsonHelper.fromJson(prefs.getString(key, null), type);
+    }
+
+    /**
+     * Stores object as json encoded string.
+     */
+    public static SharedPreferences.Editor putJson(SharedPreferences.Editor editor, String key, Object obj) {
+        editor.putString(key, GsonHelper.toJson(obj));
+        return editor;
+    }
+
+    /**
      * Retrieves serializable object stored as BASE_64 encoded string.
      */
     public static Serializable getSerializable(SharedPreferences prefs, String key) {
@@ -102,6 +126,7 @@ public class PreferencesHelper {
      * <code>String[]</code>, <code>Date</code>, <code>Serializable</code>
      * <p/>
      * See also {@link com.alexvasilkov.android.commons.prefs.Preferences#prefs()}
+     *
      * @param obj Object to be saved, cannot be null
      */
     public static <T> void save(T obj) {
