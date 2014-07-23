@@ -3,6 +3,7 @@ package com.alexvasilkov.android.commons.tasks;
 import android.os.Bundle;
 import com.azcltd.fluffyevents.EventsBus;
 
+@Deprecated
 public abstract class EventsTask extends BackgroundTask<Void> {
 
     private boolean mIsLoading;
