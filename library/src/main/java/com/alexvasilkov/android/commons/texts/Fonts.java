@@ -34,15 +34,12 @@ import java.util.regex.Pattern;
  *         android:tag="@string/font_arial_regular" />
  * </pre>
  * <p/>
- * And last step you should call one of <code>Fonts.setAll(...)</code> methods:
+ * And last step you should call one of <code>Fonts.apply(...)</code> methods:
  * <p/>
- * {@link #setAll(android.app.Activity)}<br/>
- * {@link #setAll(android.view.ViewGroup)}<br/>
- * <p/>
- * You can also set fonts manually using <code>Fonts.set(...)</code> methods:
- * <p/>
- * {@link #set(android.widget.TextView, int)}<br/>
- * {@link #set(android.widget.TextView, String)}
+ * {@link #apply(android.app.Activity)}<br/>
+ * {@link #apply(android.view.View)}<br/>
+ * {@link #apply(android.widget.TextView, int)}<br/>
+ * {@link #apply(android.widget.TextView, String)}
  */
 public final class Fonts {
 
@@ -54,27 +51,20 @@ public final class Fonts {
      * Applies fonts to all TextView views in Activity's window decor view.<br/>
      * TextView tag will be used to determine font.
      */
-    public static void setAll(Activity activity) {
-        setAllRecursive((ViewGroup) activity.getWindow().getDecorView(), activity.getAssets());
+    public static void apply(Activity activity) {
+        applyAllRecursively((ViewGroup) activity.getWindow().getDecorView(), activity.getAssets());
     }
 
     /**
-     * Applies fonts to all TextView views in given ViewGroup.<br/>
+     * If view is instance of ViewGroup, than applies fonts to all TextView views in given ViewGroup<br/>
+     * If view is instance of TextView, than applies font to provided TextView<br/>
      * TextView tag will be used to determine font.
      */
-    public static void setAll(ViewGroup viewGroup) {
-        setAllRecursive(viewGroup, viewGroup.getContext().getAssets());
-    }
-
-    private static void setAllRecursive(ViewGroup viewGroup, AssetManager assets) {
-        final int childCount = viewGroup.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View childView = viewGroup.getChildAt(i);
-            if (childView instanceof TextView) {
-                setTypeface((TextView) childView, assets, false);
-            } else if (childView instanceof ViewGroup) {
-                setAllRecursive((ViewGroup) childView, assets);
-            }
+    public static void apply(View view) {
+        if (view instanceof TextView) {
+            setTypeface((TextView) view, getFontFromTag(view.getContext().getAssets(), view, false));
+        } else if (view instanceof ViewGroup) {
+            applyAllRecursively((ViewGroup) view, view.getContext().getAssets());
         }
     }
 
@@ -82,26 +72,32 @@ public final class Fonts {
      * Applies font to TextView<br/>
      * Note: this class will only accept fonts under <code>fonts/</code> directory and fonts starting with <code>font:</code> preffix.
      */
-    public static void set(TextView textView, int fontStringId) {
-        set(textView, textView.getContext().getString(fontStringId));
+    public static void apply(TextView textView, int fontStringId) {
+        apply(textView, textView.getContext().getString(fontStringId));
     }
 
     /**
      * Applies font to TextView<br/>
      * Note: this class will only accept fonts under <code>fonts/</code> directory and fonts starting with <code>font:</code> preffix.
      */
-    public static void set(TextView textView, String fontPath) {
+    public static void apply(TextView textView, String fontPath) {
         setTypeface(textView, getFontFromString(textView.getContext().getAssets(), fontPath, true));
     }
 
-    /**
-     * Applies font to TextView basing on it's tag value.
-     */
-    public static void set(TextView textView) {
-        set(textView, (String) textView.getTag());
-    }
 
     /* Internal methods */
+
+    private static void applyAllRecursively(ViewGroup viewGroup, AssetManager assets) {
+        final int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View childView = viewGroup.getChildAt(i);
+            if (childView instanceof TextView) {
+                setTypeface((TextView) childView, assets, false);
+            } else if (childView instanceof ViewGroup) {
+                applyAllRecursively((ViewGroup) childView, assets);
+            }
+        }
+    }
 
     private static void setTypeface(TextView textView, AssetManager assets, boolean strict) {
         setTypeface(textView, getFontFromTag(assets, textView, strict));
@@ -123,7 +119,7 @@ public final class Fonts {
 
     /* Helper methods */
 
-    private static Typeface getFontFromTag(AssetManager assets, TextView view, boolean strict) {
+    private static Typeface getFontFromTag(AssetManager assets, View view, boolean strict) {
         Object tagObject = view.getTag();
         String tag = tagObject instanceof String ? (String) tagObject : null;
         return getFontFromString(assets, tag, strict);
