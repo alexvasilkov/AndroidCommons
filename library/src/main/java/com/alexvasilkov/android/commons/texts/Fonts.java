@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.alexvasilkov.android.commons.utils.Preconditions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +51,10 @@ public final class Fonts {
      * TextView tag will be used to determine font.
      */
     public static void apply(Activity activity) {
-        applyAllRecursively((ViewGroup) activity.getWindow().getDecorView(), activity.getAssets());
+        ViewGroup root = (ViewGroup) activity.getWindow().getDecorView();
+        if (root.isInEditMode()) return;
+
+        applyAllRecursively(root, activity.getAssets());
     }
 
     /**
@@ -61,10 +63,13 @@ public final class Fonts {
      * TextView tag will be used to determine font.
      */
     public static void apply(View view) {
+        if (view.isInEditMode()) return;
+
+        AssetManager assets = view.getContext().getAssets();
         if (view instanceof TextView) {
-            setTypeface((TextView) view, getFontFromTag(view.getContext().getAssets(), view, false));
+            setTypeface((TextView) view, getFontFromTag(assets, view, false));
         } else if (view instanceof ViewGroup) {
-            applyAllRecursively((ViewGroup) view, view.getContext().getAssets());
+            applyAllRecursively((ViewGroup) view, assets);
         }
     }
 
@@ -81,6 +86,8 @@ public final class Fonts {
      * Note: this class will only accept fonts under <code>fonts/</code> directory and fonts starting with <code>font:</code> preffix.
      */
     public static void apply(TextView textView, String fontPath) {
+        if (textView.isInEditMode()) return;
+
         setTypeface(textView, getFontFromString(textView.getContext().getAssets(), fontPath, true));
     }
 
@@ -104,13 +111,9 @@ public final class Fonts {
     }
 
     private static void setTypeface(TextView textView, Typeface typeface) {
-        Preconditions.checkInMainThread();
-
-        if (!textView.isInEditMode()) {
-            // Enabling sub-pixel rendering
-            textView.setPaintFlags(textView.getPaintFlags() | Paint.SUBPIXEL_TEXT_FLAG);
-            textView.setTypeface(typeface);
-        }
+        // Enabling sub-pixel rendering
+        textView.setPaintFlags(textView.getPaintFlags() | Paint.SUBPIXEL_TEXT_FLAG);
+        textView.setTypeface(typeface);
     }
 
     static Typeface getTypeface(String fontPath, AssetManager assets) {
