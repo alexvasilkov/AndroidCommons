@@ -5,6 +5,7 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,12 +24,22 @@ public class ConvertUtils {
      *
      * @param array Array to convert
      */
-    public static <T, J extends Convertable<T>> ArrayList<T> convertToList(J[] array) {
-        if (array == null) return null;
+    public static <T, J extends Convertable<T>> ArrayList<T> convert(J[] array) {
+        return convert(Arrays.asList(array));
+    }
 
-        ArrayList<T> list = new ArrayList<T>(array.length);
+    /**
+     * Converting collection of convertable items into ArrayList of target items.
+     * Note: per item ParseException are ignored.
+     *
+     * @param collection Collection to convert
+     */
+    public static <T, J extends Convertable<T>> ArrayList<T> convert(Collection<J> collection) {
+        if (collection == null) return null;
 
-        for (J json : array) {
+        ArrayList<T> list = new ArrayList<T>(collection.size());
+
+        for (J json : collection) {
             try {
                 T item = json == null ? null : json.convert();
                 if (item != null) list.add(item);
@@ -43,18 +54,34 @@ public class ConvertUtils {
 
     /**
      * Converting array of convertable items into array of target items<br/>
-     * Shortcat for {@link #listToArray(java.util.List) listToArray}({@link #convertToList(Convertable[]) convertToList(array)})
+     * Shortcut for {@link #toArray(java.util.Collection) toArray}({@link #convert(Convertable[]) convert(array)})
      */
     public static <T, J extends Convertable<T>> T[] convertToArray(J[] array) {
-        return listToArray(convertToList(array));
+        return toArray(convert(array));
     }
 
     /**
      * Converting array of convertable items into array of target items<br/>
-     * Shortcat for {@link #listToArray(java.util.List, Class) listToArray}({@link #convertToList(Convertable[]) convertToList(array)}, <code>clazz</code>)
+     * Shortcut for {@link #toArray(java.util.Collection, Class) toArray}({@link #convert(Convertable[]) convert(array)}, <code>clazz</code>)
      */
     public static <T, J extends Convertable<T>> T[] convertToArray(J[] array, Class<T> clazz) {
-        return listToArray(convertToList(array), clazz);
+        return toArray(convert(array), clazz);
+    }
+
+    /**
+     * Converting collection of convertable items into array of target items<br/>
+     * Shortcut for {@link #toArray(java.util.Collection) toArray}({@link #convert(java.util.Collection) convert(collection)})
+     */
+    public static <T, J extends Convertable<T>> T[] convertToArray(Collection<J> collection) {
+        return toArray(convert(collection));
+    }
+
+    /**
+     * Converting Collection of convertable items into array of target items<br/>
+     * Shortcut for {@link #toArray(java.util.Collection, Class) toArray}({@link #convert(java.util.Collection) convert(array)}, <code>clazz</code>)
+     */
+    public static <T, J extends Convertable<T>> T[] convertToArray(Collection<J> collection, Class<T> clazz) {
+        return toArray(convert(collection), clazz);
     }
 
     /**
@@ -120,27 +147,27 @@ public class ConvertUtils {
      * Elements in the list should be exactly of requested type, not it's descendants.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] listToArray(List<T> list) {
-        if (list == null) return null;
+    public static <T> T[] toArray(Collection<T> collection) {
+        if (collection == null) return null;
 
         T item = null;
-        for (T i : list) {
+        for (T i : collection) {
             if (i != null) {
                 item = i;
                 break;
             }
         }
 
-        return item == null ? null : listToArray(list, (Class<T>) item.getClass());
+        return item == null ? null : toArray(collection, (Class<T>) item.getClass());
     }
 
     /**
      * Converting {@link java.util.List List} into array of given type
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] listToArray(List<T> list, Class<T> clazz) {
-        if (list == null) return null;
-        return list.toArray((T[]) Array.newInstance(clazz, list.size()));
+    public static <T> T[] toArray(Collection<T> collection, Class<T> clazz) {
+        if (collection == null) return null;
+        return collection.toArray((T[]) Array.newInstance(clazz, collection.size()));
     }
 
 }
