@@ -25,7 +25,7 @@ public class ConvertUtils {
      * @param array Array to convert
      */
     public static <T, J extends Convertable<T>> ArrayList<T> convert(J[] array) {
-        return convert(Arrays.asList(array));
+        return convert(array == null ? null : Arrays.asList(array));
     }
 
     /**
