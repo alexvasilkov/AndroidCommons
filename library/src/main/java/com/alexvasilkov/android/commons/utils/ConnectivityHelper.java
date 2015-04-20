@@ -6,61 +6,74 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.NetworkInfo.State;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
 /**
- * Connectivity helper, provides simple API to listen to network connected / disconnected state.
+ * Connectivity helper provides simple API to listen for network connected / disconnected state.
  * <p/>
- * You can also use {@link #isConnected()} method, but you'll need to register defaul listener first with {@link #registerDefault(android.content.Context)}.
+ * You can also use {@link #isConnected()} method but you'll need to register default listener first
+ * with {@link #registerDefault(android.content.Context)}.
  * <p/>
  * Requires <code>android.permission.ACCESS_NETWORK_STATE</code> permission
  */
 public final class ConnectivityHelper {
 
-    private static HashMap<String, ConnectivityReceiver> sReceiversMap = new HashMap<String, ConnectivityReceiver>();
+    private static final HashMap<String, ConnectivityListener> sReceiversMap = new HashMap<>();
+    private static boolean sIsRegistered = false;
     private static boolean sIsConnected = true;
 
     /**
      * Be sure to remove receiver at appropriate time (i.e. in Activity.onPause()).
      */
     public static synchronized void register(Context context, ConnectivityListener listener) {
-
-        ConnectivityReceiver receiver = new ConnectivityReceiver(listener);
-        sReceiversMap.put(context.toString(), receiver);
-
-        context.registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        synchronized (sReceiversMap) {
+            sReceiversMap.put(context.toString(), listener);
+        }
+        registerIfNeeded(context);
     }
 
     public static synchronized void unregister(Context context) {
-        ConnectivityReceiver receiver = sReceiversMap.remove(context.toString());
-        if (receiver != null) context.unregisterReceiver(receiver);
+        sReceiversMap.remove(context.toString());
     }
 
     public static synchronized void registerDefault(Context appContext) {
-        register(appContext.getApplicationContext(), new ConnectivityListener() {
-            @Override
-            public void onConnectionLost() {
-                if (sIsConnected) {
-                    sIsConnected = false;
-                }
-            }
+        registerIfNeeded(appContext);
+    }
 
-            @Override
-            public void onConnectionEstablished() {
-                if (!sIsConnected) {
-                    sIsConnected = true;
+    private static void registerIfNeeded(Context context) {
+        if (!sIsRegistered) {
+            ConnectivityReceiver receiver = new ConnectivityReceiver(new ConnectivityListener() {
+                @Override
+                public void onConnectionLost() {
+                    synchronized (sReceiversMap) {
+                        for (ConnectivityListener l : sReceiversMap.values()) {
+                            l.onConnectionLost();
+                        }
+                    }
                 }
-            }
-        });
+
+                @Override
+                public void onConnectionEstablished() {
+                    synchronized (sReceiversMap) {
+                        for (ConnectivityListener l : sReceiversMap.values()) {
+                            l.onConnectionEstablished();
+                        }
+                    }
+                }
+            });
+            context.registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+            sIsRegistered = true;
+        }
     }
 
     public static boolean isConnected() {
         return sIsConnected;
     }
 
-    public static interface ConnectivityListener {
+    public interface ConnectivityListener {
         /**
          * Called on the UI thread when connection established (network is available).
          */
@@ -72,7 +85,7 @@ public final class ConnectivityHelper {
         void onConnectionLost();
     }
 
-    public static class ConnectivityReceiver extends BroadcastReceiver {
+    private static class ConnectivityReceiver extends BroadcastReceiver {
 
         private final ConnectivityListener mConnectivityListener;
 
@@ -83,19 +96,23 @@ public final class ConnectivityHelper {
 
         @SuppressWarnings("deprecation")
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(@NonNull Context context, @NonNull Intent intent) {
             if (!ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) return;
 
-            if (intent.hasExtra(ConnectivityManager.EXTRA_NETWORK_INFO)) {
-                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+            ConnectivityManager cm =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                State networkState = networkInfo.getState();
-                boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
 
-                if (noConnectivity) {
-                    mConnectivityListener.onConnectionLost();
-                } else if (networkState == State.CONNECTED) {
+            if (isConnected != sIsConnected) {
+                sIsConnected = isConnected;
+
+                if (isConnected) {
                     mConnectivityListener.onConnectionEstablished();
+                } else {
+                    mConnectivityListener.onConnectionLost();
                 }
             }
         }
