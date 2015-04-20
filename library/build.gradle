@@ -1,13 +1,4 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
-    }
-}
-
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion Integer.parseInt(ANDROID_COMPILE_SDK)
@@ -19,26 +10,23 @@ android {
         versionCode Integer.parseInt(VERSION_CODE)
         versionName VERSION_NAME
     }
-
-    lintOptions {
-        abortOnError false
-    }
-}
-
-configurations {
-    provided
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-    }
 }
 
 dependencies {
     provided 'com.alexvasilkov:fluffy-events:1.0.2'
-    provided 'com.android.support:support-v4:19.1.0'
-    provided 'com.google.code.gson:gson:2.+'
+    provided 'com.google.code.gson:gson:2.3.1'
+    compile 'com.android.support:support-v4:22.0.0'
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+// New version can be uploaded with 'gradlew clean :library:uploadArchives'
+apply from: 'gradle-mvn-push.gradle'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // Do not write any "compile" dependencies into the POM
+            pom*.whenConfigured { pom -> pom.dependencies.removeAll { it.scope == "compile" } }
+
+        }
+    }
+}
