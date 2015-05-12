@@ -111,6 +111,7 @@ public final class Fonts {
     }
 
     private static void setTypeface(TextView textView, Typeface typeface) {
+        if (typeface == null) return; // To not override previous typeface
         // Enabling sub-pixel rendering
         textView.setPaintFlags(textView.getPaintFlags() | Paint.SUBPIXEL_TEXT_FLAG);
         textView.setTypeface(typeface);
