@@ -40,6 +40,7 @@ public class Preferences {
     public static SharedPreferences prefs(String name) {
         if (sAppContext == null)
             throw new RuntimeException("Preferences should be initialized by calling Preferences.init(...) method");
+        if (name == null) name = "null"; // To be compatible with updated SharedPreferences logic
         return sAppContext.getSharedPreferences(name, Context.MODE_PRIVATE);
     }
 
