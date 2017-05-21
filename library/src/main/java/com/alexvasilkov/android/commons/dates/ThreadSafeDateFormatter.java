@@ -8,27 +8,38 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * Thread safe date formatter. Each thread will have it's own instance of {@link SimpleDateFormat} formatter.<br/>
- * This class provides basic methods to parse / format dates: {@link #parse(String)}, {@link #format(java.util.Date)},
- * {@link #format(long)}.
+ * Thread safe date formatter. Each thread will have it's own instance of {@link SimpleDateFormat}
+ * formatter.<br/>
+ * This class provides basic methods to parse / format dates: {@link #parse(String)},
+ * {@link #format(java.util.Date)}, {@link #format(long)}.
  */
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
 public class ThreadSafeDateFormatter {
 
     public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-    private final String mPattern;
-    private final Locale mLocale;
-    private final TimeZone mTz;
-    private final DateFormatSymbols mSymbols;
+    private final String pattern;
+    private final Locale locale;
+    private final TimeZone tz;
+    private final DateFormatSymbols symbols;
 
-    private ThreadLocal<SimpleDateFormat> mFormatter = new ThreadLocal<SimpleDateFormat>() {
+    private ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>() {
+
         protected SimpleDateFormat initialValue() {
-            Locale locale = mLocale == null ? Locale.getDefault() : mLocale;
-            SimpleDateFormat formatter = new SimpleDateFormat(mPattern, locale);
-            if (mTz != null) formatter.setTimeZone(mTz);
-            if (mSymbols != null) formatter.setDateFormatSymbols(mSymbols);
+            final Locale locale = ThreadSafeDateFormatter.this.locale == null
+                    ? Locale.getDefault() : ThreadSafeDateFormatter.this.locale;
+            final SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
+
+            if (tz != null) {
+                formatter.setTimeZone(tz);
+            }
+
+            if (symbols != null) {
+                formatter.setDateFormatSymbols(symbols);
+            }
             return formatter;
         }
+
     };
 
     public ThreadSafeDateFormatter(String pattern) {
@@ -51,19 +62,20 @@ public class ThreadSafeDateFormatter {
         this(pattern, locale, tz, null);
     }
 
-    public ThreadSafeDateFormatter(String pattern, Locale locale, TimeZone tz, DateFormatSymbols symbols) {
-        mPattern = pattern;
-        mLocale = locale;
-        mTz = tz;
-        mSymbols = symbols;
+    public ThreadSafeDateFormatter(String pattern, Locale locale, TimeZone tz,
+            DateFormatSymbols symbols) {
+        this.pattern = pattern;
+        this.locale = locale;
+        this.tz = tz;
+        this.symbols = symbols;
     }
 
     public Date parse(String str) throws ParseException {
-        return mFormatter.get().parse(str);
+        return formatter.get().parse(str);
     }
 
     public String format(Date date) {
-        return mFormatter.get().format(date);
+        return formatter.get().format(date);
     }
 
     public String format(long date) {

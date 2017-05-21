@@ -87,4 +87,6 @@ public class ISO8601DateFormatter {
         return ISO8601_PARSER.parse(str);
     }
 
+    private ISO8601DateFormatter() {}
+
 }
