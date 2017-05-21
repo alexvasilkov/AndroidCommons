@@ -3,15 +3,24 @@ package com.alexvasilkov.android.commons.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
 
-public final class KeyboardHelper {
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
+public class KeyboardHelper {
+
+    private static final int TAG_LISTENER_ID = -10010;
+
+    private KeyboardHelper() {}
 
     /**
      * Hides keyboard using currently focused view.<br/>
-     * Shortcat for {@link #hideSoftKeyboard(android.content.Context, android.view.View...) hideSoftKeyboard(activity, activity.getCurrentFocus())}.
+     * Shortcut for {@link #hideSoftKeyboard(android.content.Context, android.view.View)
+     * hideSoftKeyboard(activity, activity.getCurrentFocus())}.
      */
     public static void hideSoftKeyboard(Activity activity) {
         hideSoftKeyboard(activity, activity.getCurrentFocus());
@@ -21,73 +30,93 @@ public final class KeyboardHelper {
      * Uses given views to hide soft keyboard and to clear current focus.
      *
      * @param context Context
-     * @param views   Currently focused views
+     * @param focusedView Currently focused view
      */
-    public static void hideSoftKeyboard(Context context, View... views) {
-        if (views == null) return;
-        InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        for (View currentView : views) {
-            if (null == currentView) continue;
-            manager.hideSoftInputFromWindow(currentView.getWindowToken(), 0);
-            currentView.clearFocus();
+    public static void hideSoftKeyboard(@NonNull Context context, @Nullable View focusedView) {
+        if (focusedView == null) {
+            return;
         }
+
+        final InputMethodManager manager = (InputMethodManager)
+                context.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        manager.hideSoftInputFromWindow(focusedView.getWindowToken(), 0);
+        focusedView.clearFocus();
     }
 
     /**
      * Shows soft keyboard and requests focus for given view.
      */
     public static void showSoftKeyboard(Context context, View view) {
-        if (view == null) return;
-        InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (view == null) {
+            return;
+        }
+
+        final InputMethodManager manager = (InputMethodManager)
+                context.getSystemService(Context.INPUT_METHOD_SERVICE);
         view.requestFocus();
         manager.showSoftInput(view, 0);
     }
 
     /**
      * Registers listener for soft keyboard state changes.<br/>
-     * The state is computed based on rootView height changes.<br/>
-     * Note: In AndroidManifest corresponding activity should have <code>android:windowSoftInputMode</code>
-     * set to <code>adjustResize</code>.
+     * The state is computed based on rootView height changes.
      *
-     * @param rootView should be deepest full screen view, i.e. root of the layout passed to
-     *                 Activity.setContentView(...) or view returned by Fragment.onCreateView(...)
+     * @param rootView Should be deepest full screen view, i.e. root of the layout passed to
+     * Activity.setContentView(...) or view returned by Fragment.onCreateView(...)
      * @param listener Keyboard state listener
      */
-    public static void addKeyboardShowListener(final View rootView, final OnKeyboardShowListener listener) {
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-            private boolean mIsKeyboardShown;
-            private int mInitialHeightsDiff = -1;
+    public static void addKeyboardListener(@NonNull final View rootView,
+            @NonNull final OnKeyboardShowListener listener) {
+
+        final OnGlobalLayoutListener layoutListener = new OnGlobalLayoutListener() {
+            private boolean isKeyboardShown;
+            private int initialHeightsDiff = -1;
 
             @Override
             public void onGlobalLayout() {
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
+                final Rect frame = new Rect();
+                rootView.getWindowVisibleDisplayFrame(frame);
 
-                int heightDiff = rootView.getRootView().getHeight() - (r.bottom - r.top);
-                if (mInitialHeightsDiff == -1) {
-                    mInitialHeightsDiff = heightDiff;
+                int heightDiff = rootView.getRootView().getHeight() - (frame.bottom - frame.top);
+                if (initialHeightsDiff == -1) {
+                    initialHeightsDiff = heightDiff;
                 }
-                heightDiff -= mInitialHeightsDiff;
+                heightDiff -= initialHeightsDiff;
 
-                if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
-                    if (!mIsKeyboardShown) {
-                        mIsKeyboardShown = true;
+                if (heightDiff > 100) { // If more than 100 pixels, its probably a keyboard...
+                    if (!isKeyboardShown) {
+                        isKeyboardShown = true;
                         listener.onKeyboardShow(true);
                     }
                 } else if (heightDiff < 50) {
-                    if (mIsKeyboardShown) {
-                        mIsKeyboardShown = false;
+                    if (isKeyboardShown) {
+                        isKeyboardShown = false;
                         listener.onKeyboardShow(false);
                     }
                 }
             }
-        });
+        };
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
+        rootView.setTag(TAG_LISTENER_ID, layoutListener);
     }
 
-    public static interface OnKeyboardShowListener {
+    @SuppressWarnings("deprecation")
+    public static void removeKeyboardListener(@NonNull View rootView) {
+        final OnGlobalLayoutListener layoutListener =
+                (OnGlobalLayoutListener) rootView.getTag(TAG_LISTENER_ID);
+
+        if (Build.VERSION.SDK_INT < 16) {
+            rootView.getViewTreeObserver().removeGlobalOnLayoutListener(layoutListener);
+        } else {
+            rootView.getViewTreeObserver().removeOnGlobalLayoutListener(layoutListener);
+        }
+    }
+
+
+    public interface OnKeyboardShowListener {
         void onKeyboardShow(boolean show);
     }
 
-    private KeyboardHelper() {
-    }
 }
