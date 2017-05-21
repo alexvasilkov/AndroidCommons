@@ -3,12 +3,13 @@ package com.alexvasilkov.android.commons.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
+
+import com.alexvasilkov.android.commons.ui.Views;
 
 @SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
 public class KeyboardHelper {
@@ -106,12 +107,7 @@ public class KeyboardHelper {
     public static void removeKeyboardListener(@NonNull View rootView) {
         final OnGlobalLayoutListener layoutListener =
                 (OnGlobalLayoutListener) rootView.getTag(TAG_LISTENER_ID);
-
-        if (Build.VERSION.SDK_INT < 16) {
-            rootView.getViewTreeObserver().removeGlobalOnLayoutListener(layoutListener);
-        } else {
-            rootView.getViewTreeObserver().removeOnGlobalLayoutListener(layoutListener);
-        }
+        Views.removeOnGlobalLayoutListener(rootView, layoutListener);
     }
 
 

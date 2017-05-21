@@ -27,11 +27,11 @@ public final class TelephonyHelper {
             return false;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT < 19) {
+            return true;
+        } else {
             String defaultSmsPackageName = Telephony.Sms.getDefaultSmsPackage(context);
             return defaultSmsPackageName != null;
-        } else {
-            return true;
         }
     }
 

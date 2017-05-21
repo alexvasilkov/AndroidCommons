@@ -1,11 +1,12 @@
 package com.alexvasilkov.android.commons.utils;
 
 import android.util.Log;
-import com.alexvasilkov.android.commons.BuildConfig;
+
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 
+@SuppressWarnings("unused") // Public API
 public class GsonHelper {
 
     private static Boolean hasGson;
@@ -24,7 +25,9 @@ public class GsonHelper {
     }
 
     public static Gson get() {
-        if (gson == null) gson = new Gson();
+        if (gson == null) {
+            gson = new Gson();
+        }
         return (Gson) gson;
     }
 
@@ -46,7 +49,7 @@ public class GsonHelper {
         try {
             return str == null ? null : (T) get().fromJson(str, type);
         } catch (Exception e) {
-            if (BuildConfig.DEBUG) Log.e("GsonHelper", "Cannot parse JSON to object", e);
+            Log.e("GsonHelper", "Cannot parse JSON to object", e);
             return null;
         }
     }

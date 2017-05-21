@@ -27,11 +27,11 @@ import java.util.Locale;
  * </pre>
  */
 @SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
-public class LocalizationContext {
+public class LocalizationHelper {
 
     private static Locale locale;
 
-    private LocalizationContext() {}
+    private LocalizationHelper() {}
 
     public static void setLanguage(@NonNull String lang) {
         setLocale(new Locale(lang));
@@ -42,7 +42,7 @@ public class LocalizationContext {
      */
     public static void setLocale(@NonNull Locale locale) {
         if (!locale.equals(Locale.getDefault())) {
-            LocalizationContext.locale = locale;
+            LocalizationHelper.locale = locale;
             Locale.setDefault(locale);
         }
     }
@@ -51,7 +51,7 @@ public class LocalizationContext {
      * Wrapping provided context with new localized context, using locale set in
      * {@link #setLocale(Locale)} or {@link #setLanguage(String)}.<br/>
      * New context should be provided in {@link Activity#attachBaseContext}.<p/>
-     * See {@link LocalizationContext} for more details.
+     * See {@link LocalizationHelper} for more details.
      */
     @NonNull
     public static Context wrap(@NonNull Context origContext) {
