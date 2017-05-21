@@ -4,18 +4,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 /**
- * {@link TextWatcher} implementation that do nothing by default
+ * {@link TextWatcher} implementation that do nothing by default.
  */
+@SuppressWarnings("unused") // Public API
 public class SimpleTextWatcher implements TextWatcher {
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-    }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-    }
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
     @Override
-    public void afterTextChanged(Editable editable) {
-    }
+    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+    @Override
+    public void afterTextChanged(Editable s) {}
+
 }
