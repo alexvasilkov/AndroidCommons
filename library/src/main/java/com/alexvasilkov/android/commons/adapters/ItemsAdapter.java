@@ -1,68 +1,50 @@
 package com.alexvasilkov.android.commons.adapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * Simple {@link BaseAdapter} implementation to use with any {@link List}.<br/>
+ * {@link BaseAdapter} implementation to use {@link List} as a source.<br/>
  * {@link #getView(int, android.view.View, android.view.ViewGroup) getView} method is divided into
- * {@link #createView(Object, int, android.view.ViewGroup, android.view.LayoutInflater) createView} and
- * {@link #bindView(Object, int, android.view.View) bindView} methods.
+ * {@link #onCreateHolder(ViewGroup, int)} and {@link #onBindHolder(ViewHolder, int)} methods.
  */
-public abstract class ItemsAdapter<T> extends BaseAdapter {
 
-    private List<T> mItemsList;
-    private final WeakReference<Context> contextRef;
-    private final LayoutInflater layoutInflater;
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
+public abstract class ItemsAdapter<T, VH extends ItemsAdapter.ViewHolder> extends BaseAdapter {
 
-    public ItemsAdapter(Context context) {
-        contextRef = new WeakReference<Context>(context);
-        layoutInflater = LayoutInflater.from(context);
-    }
+    private static final int TAG_HOLDER_ID = -10001;
+
+    private List<T> items;
 
     /**
-     * Sets list to this adapter and calls {@link #notifyDataSetChanged()} to update underlying {@link android.widget.ListView}.<br/>
-     * You can pass {@code null} to clear the adapter
+     * Sets list to this adapter and calls {@link #notifyDataSetChanged()} to update underlying
+     * {@link android.widget.ListView}.<br/>
+     * You can pass {@code null} to clear the adapter.
      */
-    public void setItemsList(List<T> list) {
-        mItemsList = list;
+    public void setItemsList(@Nullable List<T> list) {
+        items = list;
         notifyDataSetChanged();
     }
 
     public List<T> getItemsList() {
-        return mItemsList;
-    }
-
-    protected Context getContext() {
-        return contextRef.get();
-    }
-
-    protected LayoutInflater getLayoutInflater() {
-        return layoutInflater;
+        return items;
     }
 
     @Override
     public int getCount() {
-        return mItemsList == null ? 0 : mItemsList.size();
+        return items == null ? 0 : items.size();
     }
 
     @Override
     public T getItem(int position) {
-        if (mItemsList == null || position < 0 || position >= mItemsList.size()) return null;
-        return mItemsList.get(position);
-    }
-
-    /**
-     * Default implementation of this adapter uses pos as id. So we can find item by it's id with no problems.
-     */
-    public T getItem(long id) {
-        return getItem((int) id);
+        if (items == null || position < 0 || position >= items.size()) {
+            return null;
+        }
+        return items.get(position);
     }
 
     @Override
@@ -70,16 +52,33 @@ public abstract class ItemsAdapter<T> extends BaseAdapter {
         return pos;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public View getView(int pos, View convertView, ViewGroup parent) {
-        T item = mItemsList.get(pos);
-        if (convertView == null) convertView = createView(item, pos, parent, layoutInflater);
-        bindView(item, pos, convertView);
-        return convertView;
+    public final View getView(int pos, View convertView, ViewGroup parent) {
+        final VH holder;
+        if (convertView == null) {
+            holder = onCreateHolder(parent, getItemViewType(pos));
+            holder.itemView.setTag(TAG_HOLDER_ID, holder);
+        } else {
+            holder = (VH) convertView.getTag(TAG_HOLDER_ID);
+        }
+
+        onBindHolder(holder, pos);
+
+        return holder.itemView;
     }
 
-    protected abstract View createView(T item, int pos, ViewGroup parent, LayoutInflater inflater);
+    protected abstract VH onCreateHolder(ViewGroup parent, int viewType);
 
-    protected abstract void bindView(T item, int pos, View convertView);
+    protected abstract void onBindHolder(VH viewHolder, int position);
+
+
+    protected static class ViewHolder {
+        public final View itemView;
+
+        protected ViewHolder(View itemView) {
+            this.itemView = itemView;
+        }
+    }
 
 }
