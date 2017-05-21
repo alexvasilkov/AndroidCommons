@@ -3,13 +3,17 @@ package com.alexvasilkov.android.commons.texts;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.MetricAffectingSpan;
 import android.util.TypedValue;
 import android.view.View;
-import com.alexvasilkov.android.commons.utils.AppContext;
 
 /**
  * SpannableStringBuilder wrapper that allows applying various text styles to single TextView.
@@ -31,87 +35,96 @@ import com.alexvasilkov.android.commons.utils.AppContext;
  * Part2 will use custom font, green color, 25sp font size and underline;
  * Part3 will use blue color only.
  */
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
 public class SpannableBuilder {
 
-    private final SpannableStringBuilder mBuilder = new SpannableStringBuilder();
+    private final SpannableStringBuilder builder = new SpannableStringBuilder();
 
-    private final Context mAppContext;
-    private final OnSpanClickListener mClickListener;
+    private final Context context;
+    private final OnSpanClickListener clickListener;
 
-    private Style mCurrentStyle;
+    private Style currentStyle;
 
-    public SpannableBuilder() {
-        this(AppContext.get());
+    public SpannableBuilder(Context context) {
+        this(context, null);
     }
 
-    public SpannableBuilder(Context appContext) {
-        this(appContext, null);
-    }
-
-    public SpannableBuilder(Context appContext, OnSpanClickListener clickListener) {
-        mAppContext = appContext.getApplicationContext();
-        mClickListener = clickListener;
+    public SpannableBuilder(Context context, OnSpanClickListener clickListener) {
+        this.context = context.getApplicationContext();
+        this.clickListener = clickListener;
     }
 
     public Style currentStyle() {
-        return mCurrentStyle;
+        return currentStyle;
     }
 
+    @NonNull
     public Style createStyle() {
-        return new Style(mAppContext, this);
+        return new Style(context, this);
     }
 
+    @NonNull
     public SpannableBuilder clearStyle() {
-        mCurrentStyle = null;
+        currentStyle = null;
         return this;
     }
 
-    public SpannableBuilder append(int stringId) {
+    @NonNull
+    public SpannableBuilder append(@StringRes int stringId) {
         return append(stringId, null);
     }
 
-    public SpannableBuilder append(int stringId, Object clickObject) {
-        return append(mAppContext.getString(stringId), clickObject);
+    @NonNull
+    public SpannableBuilder append(@StringRes int stringId, Object clickObject) {
+        return append(context.getString(stringId), clickObject);
     }
 
+    @NonNull
     public SpannableBuilder append(CharSequence text) {
         return append(text, null);
     }
 
+    @NonNull
     public SpannableBuilder append(CharSequence str, final Object clickObject) {
-        if (str == null || str.length() == 0) return this;
+        if (str == null || str.length() == 0) {
+            return this;
+        }
 
-        int length = mBuilder.length();
-        mBuilder.append(str);
+        int length = builder.length();
+        builder.append(str);
 
-        if (clickObject != null && mClickListener != null) {
+        if (clickObject != null && clickListener != null) {
             ClickableSpan clickSpan = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
-                    mClickListener.onSpanClicked(clickObject);
+                    clickListener.onSpanClicked(clickObject);
                 }
             };
-            mBuilder.setSpan(clickSpan, length, length + str.length(), SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
+            builder.setSpan(clickSpan, length, length + str.length(),
+                    SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
-        if (mCurrentStyle != null) {
-            Span span = new Span(mCurrentStyle);
-            mBuilder.setSpan(span, length, length + str.length(), SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
+        if (currentStyle != null) {
+            Span span = new Span(currentStyle);
+            builder.setSpan(span, length, length + str.length(),
+                    SpannableStringBuilder.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
         return this;
     }
 
+    @NonNull
     public CharSequence build() {
-        return mBuilder;
+        return builder;
     }
+
 
     private static class Span extends MetricAffectingSpan {
 
-        private final Style mStyle;
+        private final Style style;
 
         public Span(Style style) {
-            mStyle = style.clone();
+            this.style = style.copy();
         }
 
         @Override
@@ -125,85 +138,109 @@ public class SpannableBuilder {
         }
 
         private void apply(Paint paint) {
-            if (mStyle.typeface != null) paint.setTypeface(mStyle.typeface);
-            if (mStyle.color != Style.NO_COLOR) paint.setColor(mStyle.color);
-            if (mStyle.size != Style.NO_SIZE) paint.setTextSize(mStyle.size);
-            paint.setUnderlineText(mStyle.underline);
+            if (style.typeface != null) {
+                paint.setTypeface(style.typeface);
+            }
+            if (style.color != Style.NO_COLOR) {
+                paint.setColor(style.color);
+            }
+            if (style.size != Style.NO_SIZE) {
+                paint.setTextSize(style.size);
+            }
+            paint.setUnderlineText(style.underline);
         }
 
     }
 
-    public static class Style implements Cloneable {
+    public static class Style {
 
         private static final int NO_COLOR = Integer.MIN_VALUE;
         private static final float NO_SIZE = Float.MIN_VALUE;
 
-        // Note: will be null for cloned object
-        private final Context context;
-        private final SpannableBuilder parent;
+        private final Context context; // Note: will be null for copied object
+        private final SpannableBuilder parent; // Note: will be null for copied object
 
         private Typeface typeface;
         private int color = NO_COLOR;
         private float size = NO_SIZE;
         private boolean underline;
 
-        private Style(Context context, SpannableBuilder builer) {
+        Style(Context context, SpannableBuilder parent) {
             this.context = context;
-            this.parent = builer;
+            this.parent = parent;
         }
 
+        @NonNull
         public Style setFont(Typeface typeface) {
             this.typeface = typeface;
             return this;
         }
 
         /**
-         * For more details see {@link com.alexvasilkov.android.commons.texts.Fonts}
+         * For more details see {@link Fonts}.
          */
+        @NonNull
         public Style setFont(String fontPath) {
             return setFont(Fonts.getTypeface(fontPath, context.getAssets()));
         }
 
         /**
-         * For more details see {@link com.alexvasilkov.android.commons.texts.Fonts}
+         * For more details see {@link Fonts}.
          */
-        public Style setFont(int fontStringId) {
+        @NonNull
+        public Style setFont(@StringRes int fontStringId) {
             return setFont(context.getString(fontStringId));
         }
 
-        public Style setColor(int color) {
+        @NonNull
+        public Style setColor(@ColorInt int color) {
             this.color = color;
             return this;
         }
 
-        public Style setColorResId(int colorResId) {
-            return setColor(context.getResources().getColor(colorResId));
-        }
-
-        public Style setSize(int unit, float value) {
-            size = TypedValue.applyDimension(unit, value, context.getResources().getDisplayMetrics());
+        @SuppressWarnings("deprecation")
+        @NonNull
+        public Style setColorResId(@ColorRes int colorResId) {
+            if (Build.VERSION.SDK_INT < 23) {
+                setColor(context.getResources().getColor(colorResId));
+            } else {
+                setColor(context.getColor(colorResId));
+            }
             return this;
         }
 
         /**
-         * Setting size as scaled pixels (SP)
+         * @param unit Unit for the value, use COMPLEX_UNIT_* constants from {@link TypedValue}.
+         * @param value Value in given unit
          */
+        @NonNull
+        public Style setSize(int unit, float value) {
+            size = TypedValue.applyDimension(unit, value,
+                    context.getResources().getDisplayMetrics());
+            return this;
+        }
+
+        /**
+         * Setting size as scaled pixels (SP).
+         */
+        @NonNull
         public Style setSize(float value) {
             return setSize(TypedValue.COMPLEX_UNIT_SP, value);
         }
 
+        @NonNull
         public Style setUnderline(boolean underline) {
             this.underline = underline;
             return this;
         }
 
+        @NonNull
         public SpannableBuilder apply() {
-            parent.mCurrentStyle = this;
+            parent.currentStyle = this;
             return parent;
         }
 
-        @Override
-        protected Style clone() {
+        Style copy() {
             Style style = new Style(null, null);
             style.typeface = this.typeface;
             style.color = this.color;
