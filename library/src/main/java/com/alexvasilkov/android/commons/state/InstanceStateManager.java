@@ -2,6 +2,9 @@ package com.alexvasilkov.android.commons.state;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.alexvasilkov.android.commons.utils.GsonHelper;
 
 import java.io.Serializable;
@@ -12,49 +15,56 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Helps saving and restoring {@link android.app.Activity} or {@link android.app.Fragment} instance state.<br/>
+ * Helps saving and restoring {@link android.app.Activity} or {@link android.app.Fragment}
+ * instance state.<br/>
  * Only local fields marked with {@link InstanceState} annotation will be saved.<br/>
- * Supported fields types: boolean, boolean[], byte, byte[], char, char[], CharSequence, CharSequence[], double,
- * double[], float, float[], int, int[], long, long[], short, short[], String, String[], Bundle and all objects
- * implementing Serializable.<br/>
+ * Supported fields types: boolean, boolean[], byte, byte[], char, char[], CharSequence,
+ * CharSequence[], double, double[], float, float[], int, int[], long, long[], short, short[],
+ * String, String[], Bundle and all objects implementing Serializable.<br/>
  * See also {@link #saveInstanceState(Object, android.os.Bundle)} and
  * {@link #restoreInstanceState(Object, android.os.Bundle)} methods.
  */
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
 public class InstanceStateManager<T> {
 
-    public static final String PREFIX = "instance_state:";
+    private static final String PREFIX = "instance_state:";
+
+    private T obj;
+    private final HashMap<String, Field> fieldsMap = new HashMap<>();
+    private final HashMap<String, Boolean> isGsonMap = new HashMap<>();
+    private final HashMap<Field, String> keysMap = new HashMap<>();
+
 
     /**
      * Saving instance state of the given {@code obj} into {@code outState}.<br/>
-     * Supposed to be called from {@link android.app.Activity#onSaveInstanceState(android.os.Bundle)} or
+     * Supposed to be called from
+     * {@link android.app.Activity#onSaveInstanceState(android.os.Bundle)} or
      * {@link android.app.Fragment#onSaveInstanceState(android.os.Bundle)}.<br/>
      * Activity or Fragment itself can be used as {@code obj} parameter.
      */
-    public static <T> Bundle saveInstanceState(T obj, Bundle outState) {
-        if (outState == null) outState = new Bundle();
-
-        return new InstanceStateManager<T>(obj).saveState(outState);
+    @NonNull
+    public static <T> Bundle saveInstanceState(@NonNull T obj, @Nullable Bundle outState) {
+        if (outState == null) {
+            outState = new Bundle();
+        }
+        return new InstanceStateManager<>(obj).saveState(outState);
     }
 
     /**
-     * Restoring instance state from given {@code savedInstanceState} into the given {@code obj}.<br/>
+     * Restoring instance state from given {@code savedState} into the given {@code obj}.
+     * <br/>
      * Supposed to be called from {@link android.app.Activity#onCreate(android.os.Bundle)} or
-     * {@link android.app.Fragment#onCreate(android.os.Bundle)} prior to using of local fields marked with
-     * {@link InstanceState} annotation.
+     * {@link android.app.Fragment#onCreate(android.os.Bundle)} before starting using local fields
+     * marked with {@link InstanceState} annotation.
      */
-    public static <T> void restoreInstanceState(T obj, Bundle savedInstanceState) {
-        if (savedInstanceState == null) return;
-
-        new InstanceStateManager<T>(obj).restoreState(savedInstanceState);
+    public static <T> void restoreInstanceState(@NonNull T obj, @Nullable Bundle savedState) {
+        if (savedState != null) {
+            new InstanceStateManager<>(obj).restoreState(savedState);
+        }
     }
 
-    private T mObj;
-    private final HashMap<String, Field> mFieldsMap = new HashMap<String, Field>();
-    private final HashMap<String, Boolean> mIsGsonMap = new HashMap<String, Boolean>();
-    private final HashMap<Field, String> mKeysMap = new HashMap<Field, String>();
-
-    private InstanceStateManager(T obj) {
-        mObj = obj;
+    private InstanceStateManager(@NonNull T obj) {
+        this.obj = obj;
 
         InstanceState an;
         String key;
@@ -66,39 +76,41 @@ public class InstanceStateManager<T> {
         }
     }
 
-    private void addFields(Field[] fields) {
+    private void addFields(@NonNull Field[] fields) {
         String key;
         boolean isGson;
 
-        for (Field f : fields) {
-            if (f.getAnnotation(InstanceState.class) != null) {
+        for (Field field : fields) {
+            if (field.getAnnotation(InstanceState.class) != null) {
                 isGson = false;
-            } else if (f.getAnnotation(InstanceStateGson.class) != null) {
-                if (!GsonHelper.hasGson())
-                    throw new RuntimeException("Gson library not found for InstanceStateGson annotation");
+            } else if (field.getAnnotation(InstanceStateGson.class) != null) {
+                if (!GsonHelper.hasGson()) {
+                    throw new RuntimeException("Gson library not found for InstanceStateGson");
+                }
                 isGson = true;
             } else {
                 continue;
             }
-            key = f.getName();
+            key = field.getName();
 
-            if (mFieldsMap.containsKey(key)) {
-                throw new RuntimeException("Duplicate key \"" + key + "\" of InstanceState annotation");
+            if (fieldsMap.containsKey(key)) {
+                throw new RuntimeException("Duplicate key \"" + key + "\" of InstanceState");
             } else {
-                f.setAccessible(true); // removing private fields access restriction
-                mFieldsMap.put(key, f);
-                mIsGsonMap.put(key, isGson);
-                mKeysMap.put(f, key);
+                field.setAccessible(true); // Removing private fields access restriction
+                fieldsMap.put(key, field);
+                isGsonMap.put(key, isGson);
+                keysMap.put(field, key);
             }
         }
     }
 
-    private Bundle saveState(Bundle outState) {
+    @NonNull
+    private Bundle saveState(@NonNull Bundle outState) {
         try {
             String key;
-            for (Field f : mKeysMap.keySet()) {
-                key = mKeysMap.get(f);
-                setBundleValue(f, mObj, outState, PREFIX + key, mIsGsonMap.get(key));
+            for (Field field : keysMap.keySet()) {
+                key = keysMap.get(field);
+                setBundleValue(field, obj, outState, PREFIX + key, isGsonMap.get(key));
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Can't access field value", e);
@@ -106,12 +118,12 @@ public class InstanceStateManager<T> {
         return outState;
     }
 
-    private void restoreState(Bundle savedInstanceState) {
+    private void restoreState(@NonNull Bundle savedInstanceState) {
         try {
             String key;
-            for (Field f : mKeysMap.keySet()) {
-                key = mKeysMap.get(f);
-                setInstanceValue(f, mObj, savedInstanceState, PREFIX + key, mIsGsonMap.get(key));
+            for (Field field : keysMap.keySet()) {
+                key = keysMap.get(field);
+                setInstanceValue(field, obj, savedInstanceState, PREFIX + key, isGsonMap.get(key));
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Can't set field value", e);
@@ -119,194 +131,202 @@ public class InstanceStateManager<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private static void setBundleValue(Field f, Object obj, Bundle bundle, String key, boolean isGson)
+    private static void setBundleValue(@NonNull Field field, @NonNull Object obj,
+            @NonNull Bundle bundle, @NonNull String key, boolean isGson)
             throws IllegalAccessException {
 
         if (isGson) {
-            bundle.putString(key, GsonHelper.toJson(f.get(obj)));
+            bundle.putString(key, GsonHelper.toJson(field.get(obj)));
             return;
         }
 
-        Class<?> type = f.getType();
+        Class<?> type = field.getType();
         Type[] genericTypes = null;
-        if (f.getGenericType() instanceof ParameterizedType) {
-            genericTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+        if (field.getGenericType() instanceof ParameterizedType) {
+            genericTypes = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
         }
 
         if (type.equals(Boolean.TYPE)) {
-            bundle.putBoolean(key, f.getBoolean(obj));
+            bundle.putBoolean(key, field.getBoolean(obj));
 
         } else if (type.equals(boolean[].class)) {
-            bundle.putBooleanArray(key, (boolean[]) f.get(obj));
+            bundle.putBooleanArray(key, (boolean[]) field.get(obj));
 
         } else if (type.equals(Bundle.class)) {
-            bundle.putBundle(key, (Bundle) f.get(obj));
+            bundle.putBundle(key, (Bundle) field.get(obj));
 
         } else if (type.equals(Byte.TYPE)) {
-            bundle.putByte(key, f.getByte(obj));
+            bundle.putByte(key, field.getByte(obj));
 
         } else if (type.equals(byte[].class)) {
-            bundle.putByteArray(key, (byte[]) f.get(obj));
+            bundle.putByteArray(key, (byte[]) field.get(obj));
 
         } else if (type.equals(Character.TYPE)) {
-            bundle.putChar(key, f.getChar(obj));
+            bundle.putChar(key, field.getChar(obj));
 
         } else if (type.equals(char[].class)) {
-            bundle.putCharArray(key, (char[]) f.get(obj));
+            bundle.putCharArray(key, (char[]) field.get(obj));
 
         } else if (type.equals(CharSequence.class)) {
-            bundle.putCharSequence(key, (CharSequence) f.get(obj));
+            bundle.putCharSequence(key, (CharSequence) field.get(obj));
 
         } else if (type.equals(CharSequence[].class)) {
-            bundle.putCharSequenceArray(key, (CharSequence[]) f.get(obj));
+            bundle.putCharSequenceArray(key, (CharSequence[]) field.get(obj));
 
         } else if (type.equals(Double.TYPE)) {
-            bundle.putDouble(key, f.getDouble(obj));
+            bundle.putDouble(key, field.getDouble(obj));
 
         } else if (type.equals(double[].class)) {
-            bundle.putDoubleArray(key, (double[]) f.get(obj));
+            bundle.putDoubleArray(key, (double[]) field.get(obj));
 
         } else if (type.equals(Float.TYPE)) {
-            bundle.putFloat(key, f.getFloat(obj));
+            bundle.putFloat(key, field.getFloat(obj));
 
         } else if (type.equals(float[].class)) {
-            bundle.putFloatArray(key, (float[]) f.get(obj));
+            bundle.putFloatArray(key, (float[]) field.get(obj));
 
         } else if (type.equals(Integer.TYPE)) {
-            bundle.putInt(key, f.getInt(obj));
+            bundle.putInt(key, field.getInt(obj));
 
         } else if (type.equals(int[].class)) {
-            bundle.putIntArray(key, (int[]) f.get(obj));
+            bundle.putIntArray(key, (int[]) field.get(obj));
 
         } else if (type.equals(Long.TYPE)) {
-            bundle.putLong(key, f.getLong(obj));
+            bundle.putLong(key, field.getLong(obj));
 
         } else if (type.equals(long[].class)) {
-            bundle.putLongArray(key, (long[]) f.get(obj));
+            bundle.putLongArray(key, (long[]) field.get(obj));
 
         } else if (type.equals(Short.TYPE)) {
-            bundle.putShort(key, f.getShort(obj));
+            bundle.putShort(key, field.getShort(obj));
 
         } else if (type.equals(short[].class)) {
-            bundle.putShortArray(key, (short[]) f.get(obj));
+            bundle.putShortArray(key, (short[]) field.get(obj));
 
         } else if (type.equals(String.class)) {
-            bundle.putString(key, (String) f.get(obj));
+            bundle.putString(key, (String) field.get(obj));
 
         } else if (type.equals(String[].class)) {
-            bundle.putStringArray(key, (String[]) f.get(obj));
+            bundle.putStringArray(key, (String[]) field.get(obj));
 
         } else if (Parcelable.class.isAssignableFrom(type)) {
-            bundle.putParcelable(key, (Parcelable) f.get(obj));
+            bundle.putParcelable(key, (Parcelable) field.get(obj));
 
-        } else if (type.equals(ArrayList.class) && genericTypes[0] instanceof Class &&
-                Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
-            bundle.putParcelableArrayList(key, (ArrayList<? extends Parcelable>) f.get(obj));
+        } else if (type.equals(ArrayList.class)
+                && genericTypes != null
+                && genericTypes[0] instanceof Class
+                && Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
+            bundle.putParcelableArrayList(key, (ArrayList<? extends Parcelable>) field.get(obj));
 
         } else if (type.isArray() && Parcelable.class.isAssignableFrom(type.getComponentType())) {
-            bundle.putParcelableArray(key, (Parcelable[]) f.get(obj));
+            bundle.putParcelableArray(key, (Parcelable[]) field.get(obj));
 
         } else if (Serializable.class.isAssignableFrom(type)) {
-            bundle.putSerializable(key, (Serializable) f.get(obj));
+            bundle.putSerializable(key, (Serializable) field.get(obj));
 
         } else {
-            throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getName());
+            throw new RuntimeException("Unsupported field type: " + field.getName()
+                    + ", " + type.getName());
         }
     }
 
-    private static void setInstanceValue(Field f, Object obj, Bundle bundle, String key, boolean isGson)
+    private static void setInstanceValue(@NonNull Field field, @NonNull Object obj,
+            @NonNull Bundle bundle, @NonNull String key, boolean isGson)
             throws IllegalArgumentException, IllegalAccessException {
 
         if (isGson) {
-            f.set(obj, GsonHelper.fromJson(bundle.getString(key), f.getGenericType()));
+            field.set(obj, GsonHelper.fromJson(bundle.getString(key), field.getGenericType()));
             return;
         }
 
-        Class<?> type = f.getType();
+        Class<?> type = field.getType();
 
         Type[] genericTypes = null;
-        if (f.getGenericType() instanceof ParameterizedType) {
-            genericTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+        if (field.getGenericType() instanceof ParameterizedType) {
+            genericTypes = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
         }
 
         if (type.equals(Boolean.TYPE)) {
-            f.setBoolean(obj, bundle.getBoolean(key));
+            field.setBoolean(obj, bundle.getBoolean(key));
 
         } else if (type.equals(boolean[].class)) {
-            f.set(obj, bundle.getBooleanArray(key));
+            field.set(obj, bundle.getBooleanArray(key));
 
         } else if (type.equals(Bundle.class)) {
-            f.set(obj, bundle.getBundle(key));
+            field.set(obj, bundle.getBundle(key));
 
         } else if (type.equals(Byte.TYPE)) {
-            f.setByte(obj, bundle.getByte(key));
+            field.setByte(obj, bundle.getByte(key));
 
         } else if (type.equals(byte[].class)) {
-            f.set(obj, bundle.getByteArray(key));
+            field.set(obj, bundle.getByteArray(key));
 
         } else if (type.equals(Character.TYPE)) {
-            f.setChar(obj, bundle.getChar(key));
+            field.setChar(obj, bundle.getChar(key));
 
         } else if (type.equals(char[].class)) {
-            f.set(obj, bundle.getCharArray(key));
+            field.set(obj, bundle.getCharArray(key));
 
         } else if (type.equals(CharSequence.class)) {
-            f.set(obj, bundle.getCharSequence(key));
+            field.set(obj, bundle.getCharSequence(key));
 
         } else if (type.equals(CharSequence[].class)) {
-            f.set(obj, bundle.getCharSequenceArray(key));
+            field.set(obj, bundle.getCharSequenceArray(key));
 
         } else if (type.equals(Double.TYPE)) {
-            f.setDouble(obj, bundle.getDouble(key));
+            field.setDouble(obj, bundle.getDouble(key));
 
         } else if (type.equals(double[].class)) {
-            f.set(obj, bundle.getDoubleArray(key));
+            field.set(obj, bundle.getDoubleArray(key));
 
         } else if (type.equals(Float.TYPE)) {
-            f.setFloat(obj, bundle.getFloat(key));
+            field.setFloat(obj, bundle.getFloat(key));
 
         } else if (type.equals(float[].class)) {
-            f.set(obj, bundle.getFloatArray(key));
+            field.set(obj, bundle.getFloatArray(key));
 
         } else if (type.equals(Integer.TYPE)) {
-            f.setInt(obj, bundle.getInt(key));
+            field.setInt(obj, bundle.getInt(key));
 
         } else if (type.equals(int[].class)) {
-            f.set(obj, bundle.getIntArray(key));
+            field.set(obj, bundle.getIntArray(key));
 
         } else if (type.equals(Long.TYPE)) {
-            f.setLong(obj, bundle.getLong(key));
+            field.setLong(obj, bundle.getLong(key));
 
         } else if (type.equals(long[].class)) {
-            f.set(obj, bundle.getLongArray(key));
+            field.set(obj, bundle.getLongArray(key));
 
         } else if (type.equals(Short.TYPE)) {
-            f.setShort(obj, bundle.getShort(key));
+            field.setShort(obj, bundle.getShort(key));
 
         } else if (type.equals(short[].class)) {
-            f.set(obj, bundle.getShortArray(key));
+            field.set(obj, bundle.getShortArray(key));
 
         } else if (type.equals(String.class)) {
-            f.set(obj, bundle.getString(key));
+            field.set(obj, bundle.getString(key));
 
         } else if (type.equals(String[].class)) {
-            f.set(obj, bundle.getStringArray(key));
+            field.set(obj, bundle.getStringArray(key));
 
         } else if (Parcelable.class.isAssignableFrom(type)) {
-            f.set(obj, bundle.getParcelable(key));
+            field.set(obj, bundle.getParcelable(key));
 
-        } else if (type.equals(ArrayList.class) && genericTypes[0] instanceof Class &&
-                Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
-            f.set(obj, bundle.getParcelableArrayList(key));
+        } else if (type.equals(ArrayList.class)
+                && genericTypes != null
+                && genericTypes[0] instanceof Class
+                && Parcelable.class.isAssignableFrom((Class<?>) genericTypes[0])) {
+            field.set(obj, bundle.getParcelableArrayList(key));
 
         } else if (type.isArray() && Parcelable.class.isAssignableFrom(type.getComponentType())) {
-            f.set(obj, bundle.getParcelableArray(key));
+            field.set(obj, bundle.getParcelableArray(key));
 
         } else if (Serializable.class.isAssignableFrom(type)) {
-            f.set(obj, bundle.getSerializable(key));
+            field.set(obj, bundle.getSerializable(key));
 
         } else {
-            throw new RuntimeException("Unsupported field type: " + f.getName() + ", " + type.getSimpleName());
+            throw new RuntimeException("Unsupported field type: " + field.getName()
+                    + ", " + type.getSimpleName());
         }
 
         bundle.remove(key);
