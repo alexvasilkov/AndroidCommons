@@ -15,7 +15,7 @@ import com.alexvasilkov.android.commons.R;
  * Navigate.from(activity).forResult(requestCode).animate(Navigate.FADE).start(MyActivity.class)
  */
 @SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
-public class NavHelper {
+public class Navigate {
 
     public static final NavTransition DEFAULT = null;
 
@@ -47,7 +47,7 @@ public class NavHelper {
     private int requestCode = NO_RESULT_CODE;
     private NavTransition transition;
 
-    private NavHelper(Activity activity, Fragment fragment,
+    private Navigate(Activity activity, Fragment fragment,
             android.support.v4.app.Fragment fragmentSupport) {
         this.activity = activity;
         this.fragment = fragment;
@@ -57,22 +57,22 @@ public class NavHelper {
     /**
      * Initiates navigation starting from given activity.
      */
-    public static NavHelper from(@NonNull Activity activity) {
-        return new NavHelper(activity, null, null);
+    public static Navigate from(@NonNull Activity activity) {
+        return new Navigate(activity, null, null);
     }
 
     /**
      * Initiates navigation starting from given fragment.
      */
-    public static NavHelper from(@NonNull Fragment fragment) {
-        return new NavHelper(null, fragment, null);
+    public static Navigate from(@NonNull Fragment fragment) {
+        return new Navigate(null, fragment, null);
     }
 
     /**
      * Initiates navigation starting from given fragment.
      */
-    public static NavHelper from(@NonNull android.support.v4.app.Fragment fragment) {
-        return new NavHelper(null, null, fragment);
+    public static Navigate from(@NonNull android.support.v4.app.Fragment fragment) {
+        return new Navigate(null, null, fragment);
     }
 
     /**
@@ -81,7 +81,7 @@ public class NavHelper {
      * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)} of activity
      * (or similar method of fragment) will be used to start next activity.
      */
-    public NavHelper forResult(int requestCode) {
+    public Navigate forResult(int requestCode) {
         this.requestCode = requestCode;
         return this;
     }
@@ -89,7 +89,7 @@ public class NavHelper {
     /**
      * Sets animation to be played when activity is entered / finished.
      */
-    public NavHelper animate(@Nullable NavTransition transition) {
+    public Navigate animate(@Nullable NavTransition transition) {
         this.transition = transition;
         return this;
     }
