@@ -4,16 +4,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+@SuppressWarnings("unused") // Public API
 public class FillWidthImageView extends ImageView {
 
     public static final float DEFAULT_EMPTY_ASPECT = 16f / 9f;
 
-    private float mAspect = DEFAULT_EMPTY_ASPECT;
-    private boolean mIsEmptyAspectSpecified = false;
-    private boolean mIsSkipCurrentLayoutRequest;
+    private float aspect = DEFAULT_EMPTY_ASPECT;
+    private boolean isEmptyAspectSpecified = false;
+    private boolean isSkipCurrentLayoutRequest;
 
     public FillWidthImageView(Context context) {
         super(context);
@@ -23,67 +25,67 @@ public class FillWidthImageView extends ImageView {
         super(context, attrs);
     }
 
-    public FillWidthImageView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
     @Override
     public void requestLayout() {
-        if (!mIsSkipCurrentLayoutRequest) super.requestLayout();
+        if (!isSkipCurrentLayoutRequest) {
+            super.requestLayout();
+        }
     }
 
     private int calculateHeight(int w, float aspect) {
-        int wPadding = getPaddingLeft() + getPaddingRight();
-        int hPadding = getPaddingTop() + getPaddingBottom();
+        final int wPadding = getPaddingLeft() + getPaddingRight();
+        final int hPadding = getPaddingTop() + getPaddingBottom();
 
         // Calculating drawable result width and height
-        int dW = w - wPadding;
-        int dH = Math.round((float) dW / aspect);
+        final int dW = w - wPadding;
+        final int dH = Math.round((float) dW / aspect);
 
         return dH + hPadding;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Drawable drawable = getDrawable();
+        final Drawable drawable = getDrawable();
 
-        int w = MeasureSpec.getSize(widthMeasureSpec);
-        int h;
+        final int width = MeasureSpec.getSize(widthMeasureSpec);
+        final int height;
 
         if (drawable == null) {
-            h = calculateHeight(w, mAspect);
+            height = calculateHeight(width, aspect);
         } else {
-            int dW = drawable.getIntrinsicWidth();
-            int dH = drawable.getIntrinsicHeight();
+            final int dW = drawable.getIntrinsicWidth();
+            final int dH = drawable.getIntrinsicHeight();
 
             if (dW > 0 && dH > 0) {
-                h = calculateHeight(w, (float) dW / (float) dH);
+                height = calculateHeight(width, (float) dW / (float) dH);
             } else {
-                h = calculateHeight(w, mAspect);
+                height = calculateHeight(width, aspect);
             }
         }
 
-        setMeasuredDimension(w, h);
+        setMeasuredDimension(width, height);
     }
 
     public void setDefaultEmptyAspect() {
-        mIsEmptyAspectSpecified = false;
+        isEmptyAspectSpecified = false;
         setEmptyAspectInternal(DEFAULT_EMPTY_ASPECT);
     }
 
     public void setEmptyAspect(int width, int height) {
-        mIsEmptyAspectSpecified = true;
+        isEmptyAspectSpecified = true;
         setEmptyAspectInternal((float) width / (float) height);
     }
 
     public void setEmptyAspect(float aspect) {
-        mIsEmptyAspectSpecified = true;
+        isEmptyAspectSpecified = true;
         setEmptyAspectInternal(aspect);
     }
 
     private void setEmptyAspectInternal(float aspect) {
-        if (aspect <= 0) throw new IllegalArgumentException("Aspect cannot be <= 0");
-        mAspect = aspect;
+        if (aspect <= 0) {
+            throw new IllegalArgumentException("Aspect cannot be <= 0");
+        }
+        this.aspect = aspect;
         requestLayout();
     }
 
@@ -100,13 +102,19 @@ public class FillWidthImageView extends ImageView {
 
     @Override
     public void setImageDrawable(Drawable drawable) {
-        mIsSkipCurrentLayoutRequest = mIsEmptyAspectSpecified;
+        isSkipCurrentLayoutRequest = isEmptyAspectSpecified;
         super.setImageDrawable(drawable);
-        mIsSkipCurrentLayoutRequest = false;
+        isSkipCurrentLayoutRequest = false;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setImageResource(int resId) {
-        setImageDrawable(getResources().getDrawable(resId));
+        if (Build.VERSION.SDK_INT < 21) {
+            setImageDrawable(getResources().getDrawable(resId));
+        } else {
+            setImageDrawable(getContext().getDrawable(resId));
+        }
     }
+
 }
