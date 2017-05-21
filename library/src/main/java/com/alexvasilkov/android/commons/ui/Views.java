@@ -1,4 +1,4 @@
-package com.alexvasilkov.android.commons.utils;
+package com.alexvasilkov.android.commons.ui;
 
 import android.app.Activity;
 import android.content.Context;

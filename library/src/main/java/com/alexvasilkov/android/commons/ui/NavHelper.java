@@ -1,4 +1,4 @@
-package com.alexvasilkov.android.commons.utils;
+package com.alexvasilkov.android.commons.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

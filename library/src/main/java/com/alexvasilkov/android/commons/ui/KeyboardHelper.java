@@ -1,4 +1,4 @@
-package com.alexvasilkov.android.commons.utils;
+package com.alexvasilkov.android.commons.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
-
-import com.alexvasilkov.android.commons.ui.Views;
 
 @SuppressWarnings({ "WeakerAccess", "unused" }) // Public API
 public class KeyboardHelper {
