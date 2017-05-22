@@ -83,6 +83,9 @@ afterEvaluate { project ->
                         }
                     }
                 }
+
+                // Do not write any "compile" dependencies into the POM
+                pom*.whenConfigured { pom -> pom.dependencies.removeAll { it.scope == "compile" } }
             }
         }
     }
