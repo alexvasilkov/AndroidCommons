@@ -15,6 +15,8 @@ import android.text.style.MetricAffectingSpan;
 import android.util.TypedValue;
 import android.view.View;
 
+import com.alexvasilkov.android.commons.ui.ResourcesHelper;
+
 /**
  * SpannableStringBuilder wrapper that allows applying various text styles to single TextView.
  * <p/>
@@ -201,11 +203,7 @@ public class SpannableBuilder {
         @SuppressWarnings("deprecation")
         @NonNull
         public Style setColorResId(@ColorRes int colorResId) {
-            if (Build.VERSION.SDK_INT < 23) {
-                setColor(context.getResources().getColor(colorResId));
-            } else {
-                setColor(context.getColor(colorResId));
-            }
+            setColor(ResourcesHelper.getColor(context, colorResId));
             return this;
         }
 
