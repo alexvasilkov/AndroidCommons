@@ -73,10 +73,10 @@ public abstract class ItemsAdapter<T, VH extends ItemsAdapter.ViewHolder> extend
     protected abstract void onBindHolder(VH viewHolder, int position);
 
 
-    protected static class ViewHolder {
+    public static class ViewHolder {
         public final View itemView;
 
-        protected ViewHolder(View itemView) {
+        public ViewHolder(View itemView) {
             this.itemView = itemView;
         }
     }
