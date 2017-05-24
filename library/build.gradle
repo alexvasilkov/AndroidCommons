@@ -18,5 +18,5 @@ dependencies {
     compile 'com.android.support:customtabs:25.3.1'
 }
 
-// New version can be uploaded with 'gradlew clean :library:uploadArchives'
+// New version can be uploaded with './gradlew clean :library:uploadArchives'
 apply from: 'gradle-mvn-push.gradle'

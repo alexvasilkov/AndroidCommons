@@ -11,7 +11,7 @@ API documentation provided as [Javadoc][javadoc-url].
 
 Add dependency to your build.gradle file:
 
-    compile 'com.alexvasilkov:android-commons:2.0.0'
+    compile 'com.alexvasilkov:android-commons:2.0.1'
 
 ### Main features ###
 
@@ -75,7 +75,7 @@ Base view groups implementations that allows setting maxWidth and maxHeight.
 [mvn-url]: https://maven-badges.herokuapp.com/maven-central/com.alexvasilkov/android-commons
 [mvn-img]: https://img.shields.io/maven-central/v/com.alexvasilkov/android-commons.svg?style=flat-square
 
-[size-url]: http://www.methodscount.com/?lib=com.alexvasilkov%3Aandroid-commons%3A2.0.0
+[size-url]: http://www.methodscount.com/?lib=com.alexvasilkov%3Aandroid-commons%3A2.0.1
 [size-img]: https://img.shields.io/badge/Methods%20and%20size-764%20%7C%2078%20KB-e91e63.svg?style=flat-square
 
 [javadoc-url]: http://javadoc.io/doc/com.alexvasilkov/android-commons

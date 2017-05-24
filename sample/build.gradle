@@ -8,8 +8,8 @@ android {
         applicationId 'com.alexvasilkov.android.commons.sample'
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 18
-        versionName '2.0.0'
+        versionCode 19
+        versionName '2.0.1'
     }
 }
 
