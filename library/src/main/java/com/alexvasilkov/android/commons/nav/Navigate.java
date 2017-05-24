@@ -152,6 +152,8 @@ public class Navigate {
         intent = setupIntent(intent);
 
         if (application != null) {
+            // Extra flag is required when starting from application:
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             application.startActivity(intent);
             return; // No transitions, so just return
         }
