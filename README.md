@@ -76,6 +76,6 @@ Base view groups implementations that allows setting maxWidth and maxHeight.
 [mvn-img]: https://img.shields.io/maven-central/v/com.alexvasilkov/android-commons.svg?style=flat-square
 
 [size-url]: http://www.methodscount.com/?lib=com.alexvasilkov%3Aandroid-commons%3A2.0.2
-[size-img]: https://img.shields.io/badge/Methods%20and%20size-814%20%7C%2083KB-e91e63.svg?style=flat-square
+[size-img]: https://img.shields.io/badge/Methods%20and%20size-814%20%7C%2085%20KB-e91e63.svg?style=flat-square
 
 [javadoc-url]: http://javadoc.io/doc/com.alexvasilkov/android-commons
