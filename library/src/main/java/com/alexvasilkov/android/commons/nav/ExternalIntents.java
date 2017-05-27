@@ -137,4 +137,8 @@ public class ExternalIntents {
         return new YouTubeIntentBuilder(navigator);
     }
 
+    public void start(Intent intent) {
+        new IntentHolder(navigator, intent).start();
+    }
+
 }
